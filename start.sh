@@ -1,42 +1,55 @@
 #!/bin/bash
 
-# Função para exibir ajuda
+# Function to display help
 show_help() {
-    echo "Uso: $0 [OPÇÃO]"
-    echo "Inicia os serviços da aplicação usando Docker Compose"
+    echo "Usage: $0 [OPTION]"
+    echo "Starts application services using Docker Compose"
     echo ""
-    echo "Opções:"
-    echo "  back      Inicia apenas o backend"
-    echo "  front     Inicia apenas o frontend"
-    echo "  (nenhum)  Inicia backend e frontend (padrão)"
-    echo "  -h, --help  Mostra esta ajuda"
+    echo "Options:"
+    echo "  back      Starts only the backend"
+    echo "  front     Starts only the frontend"
+    echo "  (none)    Starts backend and frontend (default)"
+    echo "  -h, --help  Shows this help"
     echo ""
-    echo "Exemplos:"
-    echo "  $0           # Inicia backend e frontend"
-    echo "  $0 back      # Inicia apenas o backend"
-    echo "  $0 front     # Inicia apenas o frontend"
+    echo "Examples:"
+    echo "  $0           # Starts backend and frontend"
+    echo "  $0 back      # Starts only the backend"
+    echo "  $0 front     # Starts only the frontend"
 }
 
-# Verifica se foi solicitada ajuda
+# Check if help was requested
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     show_help
     exit 0
 fi
 
-# Valida o argumento
+# Validate arguments
 if [[ $# -gt 1 ]]; then
-    echo "Erro: Muitos argumentos fornecidos."
-    echo "Use '$0 --help' para ver as opções disponíveis."
+    echo "Error: Too many arguments provided."
+    echo "Use '$0 --help' to see available options."
     exit 1
 fi
 
 if [[ $# -eq 1 && "$1" != "back" && "$1" != "front" ]]; then
-    echo "Erro: Argumento inválido '$1'."
-    echo "Use '$0 --help' para ver as opções disponíveis."
+    echo "Error: Invalid argument '$1'."
+    echo "Use '$0 --help' to see available options."
     exit 1
 fi
 
-echo "--- ATENÇÃO: Iniciando limpeza radical do ambiente Docker ---"
+# Define which services will be started
+SERVICES=""
+if [[ $# -eq 0 ]]; then
+    echo "--- Starting backend and frontend ---"
+    SERVICES=""  # Empty means all services
+elif [[ "$1" == "back" ]]; then
+    echo "--- Starting only the backend ---"
+    SERVICES="backend"
+elif [[ "$1" == "front" ]]; then
+    echo "--- Starting only the frontend ---"
+    SERVICES="frontend"
+fi
+
+echo "--- WARNING: Starting radical cleanup of Docker environment ---"
 
 # Find all container IDs (both running and stopped)
 CONTAINER_IDS=$(docker ps -aq)
@@ -53,7 +66,7 @@ fi
 echo "Cleaning up project-specific volumes and networks..."
 docker compose down --remove-orphans
 
-# Check command line arguments
+# Start services based on arguments
 if [ $# -eq 0 ]; then
     echo "--- Building and starting all services (backend and frontend) ---"
     docker compose up --build
