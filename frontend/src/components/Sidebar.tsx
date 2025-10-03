@@ -4,6 +4,7 @@ import { Box, List, ListItemButton, ListItemIcon, ListItemText, Typography } fro
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import PreviewIcon from '@mui/icons-material/Preview';
 import { Dashboard, ShowChart } from "@mui/icons-material";
+import { themeColors } from "@/theme";
 
 const menu = [
   { label: "Dashboard", icon: <Dashboard />, href: "/dashboard" },
@@ -14,7 +15,7 @@ const menu = [
 
 export default function Sidebar() {
   return (
-    <Box sx={{ p: 2, backgroundColor: "background.paper", color: "text.primary" }}>
+    <Box sx={{ p: 2, backgroundColor: themeColors.palette.background.paper, color: themeColors.palette.text.primary, height: "100%" }}>
       <Typography variant="h6" mb={2} fontWeight="bold">
         Stooorage
       </Typography>
@@ -22,7 +23,7 @@ export default function Sidebar() {
         {menu.map((item) => (
           <Link key={item.label} href={item.href} style={{ textDecoration: 'none', color: 'inherit' }}>
             <ListItemButton key={item.label}>
-              <ListItemIcon sx={{ color: "text.primary" }}>{item.icon}</ListItemIcon>
+              <ListItemIcon sx={{ color: themeColors.palette.text.primary }}>{item.icon}</ListItemIcon>
               <ListItemText primary={item.label} />
             </ListItemButton>
           </Link>

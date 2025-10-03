@@ -1,26 +1,20 @@
 "use client";
 import { AppBar, Toolbar, Typography, IconButton } from "@mui/material";
-import { Brightness4, Brightness7 } from "@mui/icons-material";
+import { themeColors } from "@/theme";
 
-type HeaderProps = {
-    mode: "light" | "dark";
-    toggleMode: () => void;
-};
-
-export default function Header({ mode, toggleMode }: HeaderProps) {
+export default function Header() {
     return (
-        <AppBar position="static" >
-            <Toolbar sx={{
-                backgroundColor: "background.default",
-                color: "text.light"
-            }}>
+        <AppBar position="static" sx={{ boxShadow: "none" }}>
+            <Toolbar
+                sx={{
+                    backgroundColor: themeColors.palette.background.default,
+                    color: "text.light",
+                    minHeight: "0px",
+                }}
+            >
                 <Typography variant="h6" fontWeight="600">
                     Stooorage
                 </Typography>
-
-                <IconButton onClick={toggleMode} sx={{ color: "text.light" }}>
-                    {mode === "light" ? <Brightness4 /> : <Brightness7 />}
-                </IconButton>
             </Toolbar>
         </AppBar>
     );
