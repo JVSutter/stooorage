@@ -10,6 +10,9 @@ export default function Header() {
                     backgroundColor: themeColors.palette.background.default,
                     color: "text.light",
                     minHeight: "0px",
+                    display: "flex",
+                    justifyContent: "center",
+
                 }}
             >
                 <Typography variant="h6" fontWeight="600">

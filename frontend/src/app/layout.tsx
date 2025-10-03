@@ -41,10 +41,10 @@ export default function RootLayout({
             >
                 <Header />
                 <Box display="flex" flexGrow={1} minHeight={0}>
-                    <Box width="15%">
+                    <Box width="13%">
                         <Sidebar />
                     </Box>
-                    <Box width="85%" overflow="auto">
+                    <Box width="87%" overflow="auto">
                         {children}
                     </Box>
                 </Box>

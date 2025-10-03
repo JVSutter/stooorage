@@ -18,11 +18,11 @@ export default function Dashboard() {
   return (
     <Box sx={{ p: 3, backgroundColor: themeColors.palette.background.paper2 }}>
       <Typography variant="h5" fontWeight="600" gutterBottom>
-        Market Dashboard
+        Visão geral
       </Typography>
-      <Typography variant="body1">
+      {/* <Typography variant="body1">
         Bem-vindo ao painel! Aqui você poderá visualizar estatísticas de mercado.
-      </Typography>
+      </Typography> */}
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
