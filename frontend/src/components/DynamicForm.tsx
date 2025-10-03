@@ -28,12 +28,12 @@ const fieldSets: Record<
         url: "http://localhost:8000/products/transactions/create",
         fields: [
             { name: "transaction_no", label: "Transaction Number", type: "text" },
-            { name: "transaction_date", label: "Transaction Date", type: "date" },
+            { name: "transaction_date", label: "Transaction Date (dd/mm/yyyy)", type: "text" },
             { name: "customer_no", label: "Customer Number", type: "number" },
             { name: "country", label: "Country", type: "text" },
             { name: "product_no", label: "Product Number", type: "text" },
             { name: "quantity", label: "Quantity", type: "number" },
-            { name: "price", label: "Price", type: "number" },
+            { name: "price_at_sale", label: "Price at Sale", type: "number" },
         ],
     },
 };
@@ -58,16 +58,25 @@ const DynamicForm: React.FC = () => {
 
     const handleSubmit = async () => {
         console.log("Submitting the following data:", formData);
+        const { url, fields } = fieldSets[selectedSet];
+        const processedData = { ...formData };
+
+        fields.forEach(field => {
+            if (field.type === "date" && processedData[field.name]) {
+                const dateValue = processedData[field.name] as string;
+                const [year, month, day] = dateValue.split('-');
+                processedData[field.name] = `${day}/${month}/${year}`; 
+                console.log(`Converted date for ${field.name}:`, processedData[field.name]);
+            }
+        });
 
         try {
-            const { url } = fieldSets[selectedSet];
-
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(processedData),
             });
 
             if (!response.ok) {
@@ -108,7 +117,7 @@ const DynamicForm: React.FC = () => {
                             type={field.type}
                             value={formData[field.name] || ""}
                             onChange={handleChange}
-                            InputLabelProps={field.type === "date" ? { shrink: true } : undefined}
+                            InputLabelProps={{ shrink: true }}
                         />
                     </Grid>
                 ))}
