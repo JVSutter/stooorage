@@ -5,11 +5,26 @@ import psycopg2
 import storage
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from log import logger
 
 app = FastAPI(
     title="Stooorage Backend",
     description="API for Demand Forecasting and Inventory Optimization.",
+)
+
+# Configuração de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",  # Vite dev server
+        "http://localhost:3000",  # Next.js dev server (se usar)
+        "http://frontend:5173",   # Container do Docker
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos os métodos (GET, POST, etc)
+    allow_headers=["*"],  # Permite todos os headers
 )
 
 app.include_router(storage.router)
