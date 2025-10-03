@@ -74,6 +74,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
       {icon && (
         <Avatar 
           sx={{ 
+            background: "linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));",
             bgcolor: getAvatarColor(iconColor), 
             color: "white", 
             width: 40, 

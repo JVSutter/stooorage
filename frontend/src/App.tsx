@@ -1,183 +1,68 @@
-"use client";
-import React from "react";
-import { useState } from "react";
-import {
-    Box,
-    CssBaseline,
-    Typography,
-    Paper,
-    Grid,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-} from "@mui/material";
+import { Box } from "@mui/material";
+import { Routes, Route } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
-import WarningIcon from "@mui/icons-material/Warning";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    Tooltip,
-    AreaChart,
-    Area,
-    CartesianGrid,
-} from "recharts";
+import Sidebar from "./Sidebar";
+import Header from "./Header";
+import Dashboard from "./components/Dashboard";
 
-import Card from "./components/Card";
-
-const sidebarItems = [
-    { text: "Dashboard", icon: <DashboardIcon /> },
-    { text: "Ações", icon: <BarChartIcon /> },
-    { text: "Previsões", icon: <ShowChartIcon /> },
-    { text: "Estoque", icon: <Inventory2Icon /> },
-];
-
-const vendasSemana = [
-    { dia: "Seg", real: 60, previsao: 65 },
-    { dia: "Ter", real: 45, previsao: 50 },
-    { dia: "Qua", real: 70, previsao: 68 },
-    { dia: "Qui", real: 85, previsao: 80 },
-    { dia: "Sex", real: 90, previsao: 95 },
-    { dia: "Sáb", real: 100, previsao: 95 },
-    { dia: "Dom", real: 50, previsao: 55 },
-];
-
-const tendenciaMensal = [
-    { mes: "Jan", real: 800, previsao: 820 },
-    { mes: "Fev", real: 900, previsao: 950 },
-    { mes: "Mar", real: 1050, previsao: 1100 },
-    { mes: "Abr", real: 1020, previsao: 1040 },
-    { mes: "Mai", real: 1200, previsao: 1250 },
-    { mes: "Jun", real: 1350, previsao: 1400 },
-];
-
-const produtosMaisVendidos = [
-    { produto: "Produto A", vendas: 250 },
-    { produto: "Produto B", vendas: 210 },
-    { produto: "Produto C", vendas: 167 },
-    { produto: "Produto D", vendas: 145 },
-    { produto: "Produto E", vendas: 130 },
+const menuItems = [
+    { label: "Dashboard", path: "/dashboard", icon: DashboardIcon },
+    { label: "Ações", path: "/acoes", icon: BarChartIcon },
+    { label: "Previsões", path: "/previsoes", icon: ShowChartIcon },
+    { label: "Estoque", path: "/estoque", icon: Inventory2Icon },
 ];
 
 export default function App() {
-    const [selectedIndex, setSelectedIndex] = useState(0);
     return (
         <>
-            <Typography variant="h6" sx={{ m: 2 }}>
-                Stooorage
-            </Typography>
-            <Box sx={{ display: "flex" }}>
-                <CssBaseline />
-
+            <div style={{ display: "flex", flexDirection: "column" }}>
+                <Header />
                 <Box
-                    sx={{ width: 200, bgcolor: "#f5f5f5", minHeight: "100vh" }}
+                    sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        height: "calc(100vh - 65px)",
+                    }}
                 >
-                    <List>
-                        {sidebarItems.map((item, index) => (
-                            <ListItem key={item.text} disablePadding>
-                                <ListItemButton
-                                    selected={selectedIndex === index} // <-- selecionado
-                                    onClick={() => setSelectedIndex(index)} // <-- muda ao clicar
-                                >
-                                    <ListItemIcon>{item.icon}</ListItemIcon>
-                                    <ListItemText primary={item.text} />
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
-                    </List>
+                    <Sidebar menuItems={menuItems} />
+                    <div style={{ flex: 1, padding: 24 }}>
+                        <Routes>
+                            <Route
+                                path="/dashboard"
+                                element={<Dashboard />}
+                            />
+                            <Route path="/acoes" element={<div>Ações</div>} />
+                            <Route
+                                path="/previsoes"
+                                element={<div>Previsões</div>}
+                            />
+                            <Route
+                                path="/estoque"
+                                element={<div>Estoque</div>}
+                            />
+                            <Route path="*" element={<div>Padrão</div>} />{" "}
+                        </Routes>
+                    </div>
                 </Box>
-
-                <Box sx={{ flexGrow: 1, p: 3 }}>
-                    <Typography variant="h4" gutterBottom>
-                        Dashboard
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
-                        Visão geral do seu negócio em tempo real
-                    </Typography>
-
-                    <Grid container spacing={2} sx={{ mb: 4 }}>
-                        <Grid item xs={3}>
-                            <Card title="Vendas do mês" value="R$ 250000"  description="+12.5%" icon={<TrendingUpIcon />} iconColor="primary" />
-                        </Grid>
-                        <Grid item xs={3}>
-                            <Card title="Crescimento" value="+ 23%" description="+8.2%" icon={<ShowChartIcon />} iconColor="primary" />
-                        </Grid>
-                        <Grid item xs={3}>
-                            <Card title="Produtos em estoque" value="1847" description="-3.7%" icon={<Inventory2Icon />} iconColor="primary" />
-                        </Grid>
-                        <Grid item xs={3}>
-                            <Card title="Alertas ativos" value="7" description="" icon={<WarningIcon />} iconColor="primary" />
-                        </Grid>
+                {/* <Grid container spacing={2} sx={{ mb: 4 }}>
+                    <Grid item xs={3}>
+                        <Card title="Vendas do mês" value="R$ 250000"  description="+12.5%" icon={<TrendingUpIcon />} iconColor="primary" />
                     </Grid>
-
-                    {/* Gráficos */}
-                    <Grid container spacing={4}>
-                        <Grid item xs={6}>
-                            <Typography variant="h6">
-                                Vendas por Dia da Semana
-                            </Typography>
-                            <BarChart
-                                width={500}
-                                height={300}
-                                data={vendasSemana}
-                            >
-                                <XAxis dataKey="dia" />
-                                <YAxis />
-                                <Tooltip />
-                                <Bar dataKey="real" fill="#1976d2" />
-                                <Bar dataKey="previsao" fill="#2e7d32" />
-                            </BarChart>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                            <Typography variant="h6">
-                                Tendência Mensal
-                            </Typography>
-                            <AreaChart
-                                width={500}
-                                height={300}
-                                data={tendenciaMensal}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="mes" />
-                                <YAxis />
-                                <Tooltip />
-                                <Area
-                                    type="monotone"
-                                    dataKey="real"
-                                    stroke="#1976d2"
-                                    fill="#1976d2"
-                                />
-                                <Area
-                                    type="monotone"
-                                    dataKey="previsao"
-                                    stroke="#2e7d32"
-                                    fill="#2e7d32"
-                                />
-                            </AreaChart>
-                        </Grid>
+                    <Grid item xs={3}>
+                        <Card title="Crescimento" value="+ 23%" description="+8.2%" icon={<ShowChartIcon />} iconColor="primary" />
                     </Grid>
-
-                    <Box sx={{ mt: 4 }}>
-                        <Typography variant="h6" gutterBottom>
-                            Produtos Mais Vendidos
-                        </Typography>
-                        {produtosMaisVendidos.map((p) => (
-                            <Paper key={p.produto} sx={{ p: 1, mb: 1 }}>
-                                {p.produto}: {p.vendas}
-                            </Paper>
-                        ))}
-                    </Box>
-                </Box>
-            </Box>
+                    <Grid item xs={3}>
+                        <Card title="Produtos em estoque" value="1847" description="-3.7%" icon={<Inventory2Icon />} iconColor="primary" />
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Card title="Alertas ativos" value="7" description="" icon={<WarningIcon />} iconColor="primary" />
+                    </Grid>
+                </Grid> */}
+            </div>
         </>
     );
 }
