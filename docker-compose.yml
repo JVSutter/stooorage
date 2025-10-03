@@ -4,9 +4,15 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        ENV: ${ENV:-development}
     restart: always
+    volumes:
+      - ./backend/app/:/backend/app/
     ports:
       - "8000:8000"
+    environment:
+      - ENVIRONMENT=${ENV:-development}
 
   frontend:
     build:

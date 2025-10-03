@@ -1,4 +1,5 @@
-from typing import Dict
+from typing import Dict, Union
+from pydantic import BaseModel
 
 import uvicorn
 from fastapi import FastAPI
