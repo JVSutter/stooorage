@@ -1,5 +1,7 @@
 # Stooorage
 
+![alt text](image.png)
+
 ## O que é o Stooorage?
 
 Stooorage é uma plataforma de controle de estoque desenvolvida para o Hackathon da SECCOM 2025. Ela não só permite o gerenciamento eficiente de produtos, mas vai muito além, proporcionando ferramentas para análise de dados, previsão de demanda e otimização de inventário.
