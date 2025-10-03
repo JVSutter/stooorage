@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { useState } from "react";
 import {
@@ -17,6 +18,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 import WarningIcon from "@mui/icons-material/Warning";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
 import {
     BarChart,
@@ -28,6 +30,8 @@ import {
     Area,
     CartesianGrid,
 } from "recharts";
+
+import Card from "./components/Card";
 
 const sidebarItems = [
     { text: "Dashboard", icon: <DashboardIcon /> },
@@ -101,20 +105,16 @@ export default function App() {
 
                     <Grid container spacing={2} sx={{ mb: 4 }}>
                         <Grid item xs={3}>
-                            <Paper sx={{ p: 2 }}>
-                                Vendas do Mês: R$ 45.231
-                            </Paper>
+                            <Card title="Vendas do mês" value="R$ 250000"  description="+12.5%" icon={<TrendingUpIcon />} iconColor="primary" />
                         </Grid>
                         <Grid item xs={3}>
-                            <Paper sx={{ p: 2 }}>Crescimento: +23%</Paper>
+                            <Card title="Crescimento" value="+ 23%" description="+8.2%" icon={<ShowChartIcon />} iconColor="primary" />
                         </Grid>
                         <Grid item xs={3}>
-                            <Paper sx={{ p: 2 }}>
-                                Produtos em Estoque: 1.847
-                            </Paper>
+                            <Card title="Produtos em estoque" value="1847" description="-3.7%" icon={<Inventory2Icon />} iconColor="primary" />
                         </Grid>
                         <Grid item xs={3}>
-                            <Paper sx={{ p: 2 }}>Alertas Ativos: 7</Paper>
+                            <Card title="Alertas ativos" value="7" description="" icon={<WarningIcon />} iconColor="primary" />
                         </Grid>
                     </Grid>
 
