@@ -66,9 +66,17 @@ fi
 echo "Limpando volumes e redes específicas do projeto..."
 docker compose down --remove-orphans
 
-echo "--- Construindo e iniciando a aplicação ---"
-if [[ -z "$SERVICES" ]]; then
+# Verifica argumentos de linha de comando
+if [ $# -eq 0 ]; then
+    echo "--- Construindo e iniciando todos os serviços (backend e frontend) ---"
     docker compose up --build
+elif [ "$1" = "back" ]; then
+    echo "--- Construindo e iniciando apenas o backend ---"
+    docker compose up --build backend
+elif [ "$1" = "front" ]; then
+    echo "--- Construindo e iniciando apenas o frontend ---"
+    docker compose up --build frontend
 else
-    docker compose up --build $SERVICES
+    echo "Erro: Argumento inválido. Use 'back' ou 'front', ou não passe argumentos para rodar ambos."
+    exit 1
 fi
