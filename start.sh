@@ -1,33 +1,33 @@
 #!/bin/bash
 
-echo "--- ATENÇÃO: Iniciando limpeza radical do ambiente Docker ---"
+echo "--- WARNING: Starting aggressive Docker environment cleanup ---"
 
-# Encontra todos os IDs de containers (ativos e inativos)
+# Find all container IDs (both running and stopped)
 CONTAINER_IDS=$(docker ps -aq)
 
 if [ -n "$CONTAINER_IDS" ]; then
-    echo "Parando e removendo TODOS os containers existentes..."
+    echo "Stopping and removing ALL existing containers..."
     docker stop $CONTAINER_IDS
     docker rm $CONTAINER_IDS
-    echo "Containers limpos com sucesso."
+    echo "Containers cleaned up successfully."
 else
-    echo "Nenhum container Docker encontrado para limpar."
+    echo "No Docker containers found to clean up."
 fi
 
-echo "Limpando volumes e redes específicas do projeto..."
+echo "Cleaning up project-specific volumes and networks..."
 docker compose down --remove-orphans
 
-# Verifica argumentos de linha de comando
+# Check command line arguments
 if [ $# -eq 0 ]; then
-    echo "--- Construindo e iniciando todos os serviços (backend e frontend) ---"
+    echo "--- Building and starting all services (backend and frontend) ---"
     docker compose up --build
 elif [ "$1" = "back" ]; then
-    echo "--- Construindo e iniciando apenas o backend ---"
+    echo "--- Building and starting only the backend ---"
     docker compose up --build backend
 elif [ "$1" = "front" ]; then
-    echo "--- Construindo e iniciando apenas o frontend ---"
+    echo "--- Building and starting only the frontend ---"
     docker compose up --build frontend
 else
-    echo "Erro: Argumento inválido. Use 'back' ou 'front', ou não passe argumentos para rodar ambos."
+    echo "Error: Invalid argument. Use 'back' or 'front', or omit arguments to run both."
     exit 1
 fi

@@ -9,7 +9,7 @@ from log import get_logger
 
 app = FastAPI(
     title="Stooorage Backend",
-    description="API para Previsão de Demanda e Otimização de Estoque.",
+    description="API for Demand Forecasting and Inventory Optimization.",
 )
 
 app.include_router(storage.router)
@@ -154,9 +154,9 @@ async def config():
 @app.get("/")
 async def root():
     """
-    Endpoint inicial para testar se a API está online.
+    Initial endpoint to verify the API is online
     """
-    return {"message": "Bem-vindo ao Stooorage! API está operacional."}
+    return {"message": "Welcome to Stooorage! API is operational."}
 
 
 if __name__ == "__main__":
