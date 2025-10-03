@@ -170,46 +170,77 @@ async def get_sales_last_months(months: int = 3):
 
 @router.get("/")
 async def get_products(
-    product_no: Optional[str] = None, product_name: Optional[str] = None
+    product_no: Optional[str] = None,
+    product_name: Optional[str] = None,
+    page: int = 1,
+    page_size: int = 20,
 ):
-    """Get all products from the database."""
-
+    """Get products with optional filters and pagination (default 20 per page)."""
     logger = get_logger()
     logger.debug(
-        f"Fetching products with filters: product_no={product_no}, product_name={product_name}"
+        f"Fetching products filters: product_no={product_no}, product_name={product_name}, page={page}, page_size={page_size}"
     )
+
+    if page < 1 or page_size < 1 or page_size > 200:
+        raise HTTPException(status_code=400, detail="Invalid page or page_size")
 
     try:
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                query = "SELECT * FROM product"
+                base_query = "FROM product"
                 params = []
                 conditions = []
 
-                for condition, value in [
+                for column, value in [
                     ("product_no", product_no),
                     ("product_name", product_name),
                 ]:
                     if value is not None:
-                        conditions.append(f"{condition} = %s")
+                        conditions.append(f"{column} = %s")
                         params.append(value)
 
+                where_clause = ""
                 if conditions:
-                    query += " WHERE " + " AND ".join(conditions)
+                    where_clause = " WHERE " + " AND ".join(conditions)
 
-                cur.execute(query, params)
-                products = cur.fetchall()
+                # Total count
+                count_query = f"SELECT COUNT(*) {base_query}{where_clause}"
+                cur.execute(count_query, params)
+                total = cur.fetchone()[0]
+
+                # Pagination
+                offset = (page - 1) * page_size
+                data_query = (
+                    f"SELECT product_no, product_name, price, quantity "
+                    f"{base_query}{where_clause} "
+                    "ORDER BY product_no "
+                    "LIMIT %s OFFSET %s"
+                )
+                cur.execute(data_query, params + [page_size, offset])
+                rows = cur.fetchall()
+
+                products = [
+                    {
+                        "product_no": r[0],
+                        "product_name": r[1],
+                        "price": float(r[2]),
+                        "quantity": r[3],
+                    }
+                    for r in rows
+                ]
+
+                total_pages = (total + page_size - 1) // page_size if total else 0
 
                 return {
-                    "products": [
-                        {
-                            "product_no": row[0],
-                            "product_name": row[1],
-                            "price": float(row[2]),
-                            "quantity": row[3],
-                        }
-                        for row in products
-                    ]
+                    "products": products,
+                    "pagination": {
+                        "total": total,
+                        "page": page,
+                        "page_size": page_size,
+                        "total_pages": total_pages,
+                        "has_next": page < total_pages,
+                        "has_prev": page > 1,
+                    },
                 }
 
     except Exception as e:
