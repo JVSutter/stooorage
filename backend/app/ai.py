@@ -189,6 +189,8 @@ def forecast_all(periods: int = 8, frequency: str = "month"):
 @router.get("/forecast/total/{periods}")
 def forecast_total(periods: int = 8, frequency: str = "month"):
     frequency = frequency.lower()
+    frequency = "week"
+    periods = 40
     if frequency == "week":
         sql_trunc = 'week'
         prophet_freq = 'W'
@@ -225,18 +227,18 @@ def forecast_total(periods: int = 8, frequency: str = "month"):
         df["ds"] = df["ds"].dt.tz_localize(None)
 
     # Datas contínuas
-    df = df.set_index("ds").resample(resample_rule).sum().reset_index()
-    df["y"] = df["y"].fillna(0)
+    # df = df.set_index("ds").resample(resample_rule).sum().reset_index()
+    # df["y"] = df["y"].fillna(0)
 
     # Adicionar capacidade máxima para crescimento logístico
-    df["cap"] = df["y"].max() * 1.2  # 20% acima do máximo histórico
-    # Opcional: floor
-    df["floor"] = 0
+    # df["cap"] = df["y"].max() * 1.2  # 20% acima do máximo histórico
+    # # Opcional: floor
+    # df["floor"] = 0
 
     # Modelo Prophet
     model = Prophet(
-        growth="logistic",
-        weekly_seasonality=(frequency == "week"),
+        # growth="logistic",
+        weekly_seasonality=True,
         yearly_seasonality=True,
     )
     model.fit(df)
@@ -246,8 +248,8 @@ def forecast_total(periods: int = 8, frequency: str = "month"):
     if future['ds'].dt.tz is not None:
         future['ds'] = future['ds'].dt.tz_localize(None)
     # Adicionar cap/floor no futuro
-    future["cap"] = df["cap"].max()
-    future["floor"] = 0
+    # future["cap"] = df["cap"].max()
+    # future["floor"] = 0
 
     # Previsão
     forecast = model.predict(future)
