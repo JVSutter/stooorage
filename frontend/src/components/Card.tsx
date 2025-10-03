@@ -48,7 +48,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
       }}
     >
       {/* Lado esquerdo com textos */}
-      <Box>
+      <Box sx={{ textAlign: "left" }}>
         <Typography variant="body2" color="text.secondary">
           {title}
         </Typography>
