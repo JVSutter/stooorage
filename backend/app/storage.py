@@ -99,6 +99,75 @@ async def in_storage():
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
+@router.get("/sales/last-months")
+async def get_sales_last_months(months: int = 3):
+    """Get the number of sales and total profit for the last N months."""
+
+    logger = get_logger()
+    logger.debug(f"Fetching sales and profit for the last {months} months")
+
+    try:
+        with psycopg2.connect(**db_config) as conn:
+            with conn.cursor() as cur:
+                summary_query = """
+                SELECT 
+                    COUNT(*) as total_transactions,
+                    SUM(st.quantity) as total_quantity_sold,
+                    SUM(st.price_at_sale * st.quantity) as total_revenue
+                FROM sales_transaction st
+                JOIN product p ON st.product_no = p.product_no
+                WHERE st.transaction_date >= CURRENT_DATE - INTERVAL '%s months'
+                """
+
+                cur.execute(summary_query, (months,))
+                summary_result = cur.fetchone()
+
+                monthly_query = """
+                SELECT 
+                    DATE_TRUNC('month', st.transaction_date) as month_start,
+                    COUNT(*) as transactions,
+                    SUM(st.quantity) as quantity_sold,
+                    SUM(st.price_at_sale * st.quantity) as revenue
+                FROM sales_transaction st
+                JOIN product p ON st.product_no = p.product_no
+                WHERE st.transaction_date >= CURRENT_DATE - INTERVAL '%s months'
+                GROUP BY DATE_TRUNC('month', st.transaction_date)
+                ORDER BY month_start DESC
+                """
+
+                cur.execute(monthly_query, (months,))
+                monthly_results = cur.fetchall()
+
+                return {
+                    "period": f"Last {months} months",
+                    "summary": {
+                        "total_transactions": (
+                            summary_result[0] if summary_result[0] else 0
+                        ),
+                        "total_quantity_sold": (
+                            summary_result[1] if summary_result[1] else 0
+                        ),
+                        "total_revenue": (
+                            float(summary_result[2]) if summary_result[2] else 0.0
+                        ),
+                    },
+                    "monthly_breakdown": [
+                        {
+                            "month": row[0].strftime("%Y-%m") if row[0] else None,
+                            "month_start": row[0].isoformat() if row[0] else None,
+                            "transactions": row[1],
+                            "quantity_sold": row[2],
+                            "revenue": float(row[3]) if row[3] else 0.0,
+                        }
+                        for row in monthly_results
+                    ],
+                }
+
+    except Exception as e:
+        logger.error(f"Error fetching sales and profit data: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+
+
 @router.get("/")
 async def get_products(
     product_no: Optional[str] = None, product_name: Optional[str] = None
