@@ -1,4 +1,4 @@
-import Estoque from "@/components/Estoque";
+import Estoque from "@/components/Stock";
 
 export default function DashboardPage() {
   return <Estoque />;

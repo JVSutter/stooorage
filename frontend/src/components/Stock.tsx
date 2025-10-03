@@ -2,7 +2,7 @@
 import { Box, Typography } from "@mui/material";
 import { themeColors } from "@/theme";
 
-export default function Estoque() {
+export default function Stock() {
   return (
     <Box p={3}>
       <Typography variant="h5" fontWeight="600" gutterBottom>

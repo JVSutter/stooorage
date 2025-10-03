@@ -3,14 +3,15 @@ import Link from "next/link";
 import { Box, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import PreviewIcon from '@mui/icons-material/Preview';
-import { Dashboard, ShowChart } from "@mui/icons-material";
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import { Dashboard } from "@mui/icons-material";
 import { themeColors } from "@/theme";
 
 const menu = [
   { label: "Dashboard", icon: <Dashboard />, href: "/dashboard" },
-  { label: "Ações", icon: <ShowChart />, href: "/acoes" },
-  { label: "Previsões", icon: <PreviewIcon />, href: "/previsoes" },
-  { label: "Estoque", icon: <Inventory2Icon />, href: "/estoque" },
+  { label: "Ações", icon: <PendingActionsIcon />, href: "/actions" },
+  { label: "Previsões", icon: <PreviewIcon />, href: "/predictions" },
+  { label: "Estoque", icon: <Inventory2Icon />, href: "/stock" },
 ];
 
 export default function Sidebar() {

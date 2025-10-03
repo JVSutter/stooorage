@@ -3,11 +3,11 @@
 import { Box, Typography } from "@mui/material";
 import { themeColors } from "@/theme";
 
-export default function Acoes() {
+export default function Predictions() {
   return (
     <Box p={3}>
       <Typography variant="h5" fontWeight="600" gutterBottom>
-        Ações!!!!
+        Previsões!!!!
       </Typography>
       <Typography variant="body1" color={themeColors.palette.text.secondary}>
         Bem-vindo ao painel! Aqui você poderá visualizar estatísticas de mercado.

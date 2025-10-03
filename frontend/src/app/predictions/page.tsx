@@ -1,4 +1,4 @@
-import Previsoes from "@/components/Previsoes";
+import Previsoes from "@/components/Predictions";
 
 export default function DashboardPage() {
   return <Previsoes />;

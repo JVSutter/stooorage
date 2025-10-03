@@ -1,5 +1,5 @@
 
-import Acoes from "@/components/Acoes";
+import Acoes from "@/components/Actions";
 
 export default function DashboardPage() {
   return <Acoes />;
