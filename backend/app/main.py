@@ -92,5 +92,4 @@ async def get_previsao(sku_code: str):
 
 
 if __name__ == "__main__":
-    config()
     uvicorn.run(app, host="0.0.0.0", port=8000)
