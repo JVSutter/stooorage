@@ -1,5 +1,54 @@
 #!/bin/bash
 
+# Função para exibir ajuda
+show_help() {
+    echo "Uso: $0 [OPÇÃO]"
+    echo "Inicia os serviços da aplicação usando Docker Compose"
+    echo ""
+    echo "Opções:"
+    echo "  back      Inicia apenas o backend"
+    echo "  front     Inicia apenas o frontend"
+    echo "  (nenhum)  Inicia backend e frontend (padrão)"
+    echo "  -h, --help  Mostra esta ajuda"
+    echo ""
+    echo "Exemplos:"
+    echo "  $0           # Inicia backend e frontend"
+    echo "  $0 back      # Inicia apenas o backend"
+    echo "  $0 front     # Inicia apenas o frontend"
+}
+
+# Verifica se foi solicitada ajuda
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_help
+    exit 0
+fi
+
+# Valida o argumento
+if [[ $# -gt 1 ]]; then
+    echo "Erro: Muitos argumentos fornecidos."
+    echo "Use '$0 --help' para ver as opções disponíveis."
+    exit 1
+fi
+
+if [[ $# -eq 1 && "$1" != "back" && "$1" != "front" ]]; then
+    echo "Erro: Argumento inválido '$1'."
+    echo "Use '$0 --help' para ver as opções disponíveis."
+    exit 1
+fi
+
+# Define quais serviços serão iniciados
+SERVICES=""
+if [[ $# -eq 0 ]]; then
+    echo "--- Iniciando backend e frontend ---"
+    SERVICES=""  # Vazio significa todos os serviços
+elif [[ "$1" == "back" ]]; then
+    echo "--- Iniciando apenas o backend ---"
+    SERVICES="backend"
+elif [[ "$1" == "front" ]]; then
+    echo "--- Iniciando apenas o frontend ---"
+    SERVICES="frontend"
+fi
+
 echo "--- ATENÇÃO: Iniciando limpeza radical do ambiente Docker ---"
 
 # Encontra todos os IDs de containers (ativos e inativos)
@@ -18,4 +67,8 @@ echo "Limpando volumes e redes específicas do projeto..."
 docker compose down --remove-orphans
 
 echo "--- Construindo e iniciando a aplicação ---"
-docker compose up --build
+if [[ -z "$SERVICES" ]]; then
+    docker compose up --build
+else
+    docker compose up --build $SERVICES
+fi
