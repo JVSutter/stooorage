@@ -1,3 +1,7 @@
+"""
+Code pertaining to product storage and sales transactions.
+"""
+
 import os
 from typing import Optional
 
@@ -40,7 +44,10 @@ class TransactionCreate(BaseModel):
 
 @router.post("/create")
 async def create_product(product: ProductCreate):
-    """Insert a new product into the database."""
+    """
+    Insert a new product into the database.
+    @param product: The product to be inserted into our database.
+    """
 
     try:
         with psycopg2.connect(**db_config) as conn:
@@ -100,7 +107,10 @@ async def in_storage():
 
 @router.get("/sales/last-months")
 async def get_sales_last_months(months: int = 3):
-    """Get the number of sales and total profit for the last N months."""
+    """
+    Get the number of sales and total profit for the last N months.
+    @param months: The last N months which we are going to analyze. Default is 3.
+    """
 
     logger.debug(f"Fetching sales and profit for the last {months} months")
 
@@ -173,7 +183,13 @@ async def get_products(
     page: int = 1,
     page_size: int = 20,
 ):
-    """Get all products from the database."""
+    """
+    Get all products from the database.
+    @param product_no: Optional filter by product number.
+    @param product_name: Optional filter by product name.
+    @param page: Page number for pagination (default is 1).
+    @param page_size: Number of items per page (default is 20, max is 200).
+    """
 
     logger.debug(
         f"Fetching products filters: product_no={product_no}, product_name={product_name}, page={page}, page_size={page_size}"
@@ -248,7 +264,10 @@ async def get_products(
 
 @router.post("/transactions/create")
 async def create_transaction(transaction: TransactionCreate):
-    """Registers a new sales transaction and updates our product inventory."""
+    """
+    Registers a new sales transaction and updates our product inventory.
+    @param transaction: The sales transaction to be created.
+    """
 
     try:
         with psycopg2.connect(**db_config) as conn:
@@ -328,7 +347,10 @@ async def create_transaction(transaction: TransactionCreate):
 
 @router.get("/transactions/")
 async def get_transactions(product_no: Optional[str] = None):
-    """Get all sales transactions from the database."""
+    """
+    Get all sales transactions from the database.
+    @param product_no: Optional filter by product number.
+    """
 
     logger.debug(f"Fetching transactions with filter: product_no={product_no}")
 

@@ -1,13 +1,11 @@
 import os
 
+import ai
 import psycopg2
 import storage
 import uvicorn
 from fastapi import FastAPI
-
 from log import logger
-import ai
-
 
 app = FastAPI(
     title="Stooorage Backend",

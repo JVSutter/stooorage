@@ -1,3 +1,7 @@
+"""
+Logging configuration for our backend
+"""
+
 import logging
 
 logging.basicConfig(
