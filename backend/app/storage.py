@@ -1,5 +1,4 @@
 import os
-
 from typing import Optional
 
 import psycopg2
@@ -78,8 +77,15 @@ async def create_product(product: ProductCreate):
 
 
 @router.get("/")
-async def get_products(product_no: Optional[int] = None, product_name: Optional[str] = None):
+async def get_products(
+    product_no: Optional[str] = None, product_name: Optional[str] = None
+):
     """Get all products from the database."""
+
+    logger = get_logger()
+    logger.debug(
+        f"Fetching products with filters: product_no={product_no}, product_name={product_name}"
+    )
 
     try:
         with psycopg2.connect(**db_config) as conn:
@@ -115,7 +121,6 @@ async def get_products(product_no: Optional[int] = None, product_name: Optional[
                 }
 
     except Exception as e:
-        logger = get_logger()
         logger.error(f"Error fetching products: {e}")
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
@@ -202,14 +207,27 @@ async def create_transaction(transaction: TransactionCreate):
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
-@router.get("/transactions")
-async def get_transactions():
+@router.get("/transactions/")
+async def get_transactions(product_no: Optional[str] = None):
     """Get all sales transactions from the database."""
+
+    logger = get_logger()
+    logger.debug(f"Fetching transactions with filter: product_no={product_no}")
 
     try:
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT * FROM sales_transaction")
+                query = "SELECT * FROM sales_transaction"
+                params = []
+                conditions = []
+
+                if product_no is not None:
+                    conditions.append("product_no = %s")
+                    params.append(product_no)
+
+                if conditions:
+                    query += " WHERE " + " AND ".join(conditions)
+                cur.execute(query, params)
                 transactions = cur.fetchall()
 
                 return {
@@ -228,6 +246,5 @@ async def get_transactions():
                 }
 
     except Exception as e:
-        logger = get_logger()
         logger.error(f"Error fetching transactions: {e}")
         raise HTTPException(status_code=500, detail="Internal server error") from e
