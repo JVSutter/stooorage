@@ -39,7 +39,7 @@ const Dashboard: React.FC = () => {
                     fontWeight: 800,
                 }}
             >
-                Dashboard
+                Painel
             </Typography>
             <Typography
                 variant="subtitle1"
@@ -51,7 +51,7 @@ const Dashboard: React.FC = () => {
                     marginBottom: "2%",
                 }}
             >
-                Real-time overview of your business
+                Visão geral das métricas do seu estoque
             </Typography>
             <Grid container spacing={2} sx={{ mb: 4 }}>
                 <Grid item xs={12} sm={6} md={3}>

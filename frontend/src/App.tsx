@@ -13,10 +13,10 @@ import Inventory from "./components/Inventory";
 import Forecast from "./components/Forecast";
 
 const menuItems = [
-    { label: "Dashboard", path: "/dashboard", icon: DashboardIcon },
-    { label: "Actions", path: "/actions", icon: BarChartIcon },
-    { label: "Forecast", path: "/forecast", icon: ShowChartIcon },
-    { label: "Inventory", path: "/inventory", icon: Inventory2Icon },
+    { label: "Painel", path: "/dashboard", icon: DashboardIcon },
+    { label: "Ações", path: "/actions", icon: BarChartIcon },
+    { label: "Previsão", path: "/forecast", icon: ShowChartIcon },
+    { label: "Inventário", path: "/inventory", icon: Inventory2Icon },
 ];
 
 export default function App() {

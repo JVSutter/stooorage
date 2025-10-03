@@ -18,22 +18,22 @@ const fieldSets: Record<
     product: {
         url: "http://localhost:8000/products/create",
         fields: [
-            { name: "product_no", label: "Product Number", type: "text" },
-            { name: "product_name", label: "Product Name", type: "text" },
-            { name: "price", label: "Price", type: "number" },
-            { name: "quantity", label: "Quantity", type: "number" },
+            { name: "product_no", label: "Número do Produto", type: "text" },
+            { name: "product_name", label: "Nome do Produto", type: "text" },
+            { name: "price", label: "Preço", type: "number" },
+            { name: "quantity", label: "Quantidade", type: "number" },
         ],
     },
     sales_transaction: {
         url: "http://localhost:8000/products/transactions/create",
         fields: [
-            { name: "transaction_no", label: "Transaction Number", type: "text" },
-            { name: "transaction_date", label: "Transaction Date (dd/mm/yyyy)", type: "text" },
-            { name: "customer_no", label: "Customer Number", type: "number" },
-            { name: "country", label: "Country", type: "text" },
-            { name: "product_no", label: "Product Number", type: "text" },
-            { name: "quantity", label: "Quantity", type: "number" },
-            { name: "price_at_sale", label: "Price at Sale", type: "number" },
+            { name: "transaction_no", label: "Número de Transação", type: "text" },
+            { name: "transaction_date", label: "Data da Transação (dd/mm/yyyy)", type: "text" },
+            { name: "customer_no", label: "Número do Cliente", type: "number" },
+            { name: "country", label: "País", type: "text" },
+            { name: "product_no", label: "Número do Produto", type: "text" },
+            { name: "quantity", label: "Quantidade", type: "number" },
+            { name: "price_at_sale", label: "Preço de Venda", type: "number" },
         ],
     },
 };
@@ -95,15 +95,15 @@ const DynamicForm: React.FC = () => {
     return (
         <Box sx={{ mb: 4 }}>
             <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel id="field-set-select-label">Field Set</InputLabel>
+                <InputLabel id="field-set-select-label">Ação</InputLabel>
                 <Select
                     labelId="field-set-select-label"
                     value={selectedSet}
                     label="Field Set"
                     onChange={handleSetChange}
                 >
-                    <MenuItem value="product">Product</MenuItem>
-                    <MenuItem value="sales_transaction">Sales Transaction</MenuItem>
+                    <MenuItem value="product">Produto</MenuItem>
+                    <MenuItem value="sales_transaction">Transação de Venda</MenuItem>
                 </Select>
             </FormControl>
 
@@ -124,7 +124,7 @@ const DynamicForm: React.FC = () => {
             </Grid>
 
             <Button variant="contained" color="primary" onClick={handleSubmit}>
-                Submit
+                Enviar
             </Button>
         </Box>
     );
