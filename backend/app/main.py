@@ -14,6 +14,7 @@ app = FastAPI(
 
 app.include_router(storage.router)
 
+
 @app.on_event("startup")
 def config():
     """
