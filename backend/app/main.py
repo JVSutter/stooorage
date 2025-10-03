@@ -1,6 +1,8 @@
 from typing import Dict
 
-from config import config
+import os
+
+import psycopg2
 import uvicorn
 from fastapi import FastAPI
 
@@ -8,6 +10,27 @@ app = FastAPI(
     title="Stooorage Backend",
     description="API para Previsão de Demanda e Otimização de Estoque.",
 )
+
+
+@app.on_event("startup")
+async def config():
+    print("Conectando ao banco de dados PostgreSQL...")
+
+    # Replace with your actual settings
+    conn = psycopg2.connect(
+        host="database",
+        port=5432,
+        dbname=os.environ.get("POSTGRESQL_DATABASE"),
+        user=os.environ.get("POSTGRESQL_USERNAME"),
+        password=os.environ.get("POSTGRESQL_PASSWORD"),
+    )
+
+    cur = conn.cursor()
+    cur.execute("SELECT version();")
+    print(cur.fetchone())
+
+    cur.close()
+    conn.close()
 
 
 @app.get("/")
