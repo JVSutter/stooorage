@@ -4,8 +4,8 @@ import psycopg2
 import storage
 import uvicorn
 from fastapi import FastAPI
-from pydantic import BaseModel
 from log import get_logger
+from pydantic import BaseModel
 
 app = FastAPI(
     title="Stooorage Backend",
@@ -21,6 +21,7 @@ db_connection_parameters = {
     "user": os.environ.get("POSTGRESQL_USERNAME"),
     "password": os.environ.get("POSTGRESQL_PASSWORD"),
 }
+
 
 @app.on_event("startup")
 async def config():
@@ -39,7 +40,9 @@ async def config():
             logger.info("PostgreSQL is available.")
             break
         except psycopg2.OperationalError as e:
-            logger.warning(f"PostgreSQL not available yet ({e}), retrying in 1 seconds...")
+            logger.warning(
+                f"PostgreSQL not available yet ({e}), retrying in 1 seconds..."
+            )
             import time
 
             time.sleep(1)
@@ -61,7 +64,9 @@ async def config():
                 cur.execute("SELECT COUNT(*) FROM product;")
                 existing = cur.fetchone()[0]
                 if existing > 0:
-                    logger.info(f"Skipping population (product table already has {existing} rows).")
+                    logger.info(
+                        f"Skipping population (product table already has {existing} rows)."
+                    )
                     return
 
                 # 3. Populate (Python version of populate.sql)
@@ -139,7 +144,9 @@ async def config():
                 scount = cur.fetchone()[0]
 
                 conn.commit()
-                logger.info(f"Population complete: product={pcount}, sales_transaction={scount}")
+                logger.info(
+                    f"Population complete: product={pcount}, sales_transaction={scount}"
+                )
 
     except FileNotFoundError:
         logger.error(f"SQL file not found: {sql_file_path}")
