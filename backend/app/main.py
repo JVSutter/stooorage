@@ -4,8 +4,11 @@ import psycopg2
 import storage
 import uvicorn
 from fastapi import FastAPI
-from log import get_logger
 from pydantic import BaseModel
+
+from log import get_logger
+from ai import ai_client
+
 
 app = FastAPI(
     title="Stooorage Backend",
@@ -155,7 +158,11 @@ def root():
     """
     Initial endpoint to verify the API is online
     """
-    return {"message": "Welcome to Stooorage! API is operational."}
+    ai_response = ai_client.models.generate_content(
+        model="gemini-2.5-flash", contents="Apresente-se brevemente"
+    )
+
+    return {"message": ai_response.text}
 
 
 if __name__ == "__main__":
