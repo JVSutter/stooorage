@@ -103,7 +103,7 @@ async def get_products():
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
-@router.post("/transaction")
+@router.post("/transactions/create")
 async def create_transaction(transaction: TransactionCreate):
     """Registers a new sales transaction and updates our product inventory."""
 
@@ -182,4 +182,35 @@ async def create_transaction(transaction: TransactionCreate):
         raise
     except Exception as e:
         logger.error(f"Unexpected error creating transaction: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+
+
+@router.get("/transactions/")
+async def get_transactions():
+    """Get all sales transactions from the database."""
+
+    try:
+        with psycopg2.connect(**db_config) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT * FROM sales_transaction")
+                transactions = cur.fetchall()
+
+                return {
+                    "transactions": [
+                        {
+                            "transaction_no": row[0],
+                            "transaction_date": row[1].isoformat(),
+                            "customer_no": row[2],
+                            "country": row[3],
+                            "product_no": row[4],
+                            "quantity": row[5],
+                            "price_at_sale": float(row[6]),
+                        }
+                        for row in transactions
+                    ]
+                }
+
+    except Exception as e:
+        logger = get_logger()
+        logger.error(f"Error fetching transactions: {e}")
         raise HTTPException(status_code=500, detail="Internal server error") from e
