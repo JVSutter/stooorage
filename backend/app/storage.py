@@ -20,7 +20,7 @@ db_config = {
 class ProductCreate(BaseModel):
     """Expected format for creating a new product."""
 
-    product_no: int
+    product_no: str
     product_name: str
     price: float
     quantity: int
@@ -29,11 +29,11 @@ class ProductCreate(BaseModel):
 class TransactionCreate(BaseModel):
     """Expected format for creating a new sales transaction."""
 
-    transaction_no: int
+    transaction_no: str
     transaction_date: str
     customer_no: int
     country: str
-    product_no: int
+    product_no: str
     quantity: int
     price_at_sale: float
 
@@ -202,7 +202,7 @@ async def create_transaction(transaction: TransactionCreate):
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
-@router.get("/transactions/")
+@router.get("/transactions")
 async def get_transactions():
     """Get all sales transactions from the database."""
 

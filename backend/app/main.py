@@ -3,7 +3,6 @@ import os
 import psycopg2
 import storage
 import uvicorn
-from typing import Dict
 from fastapi import FastAPI
 from pydantic import BaseModel
 from log import get_logger
@@ -28,8 +27,8 @@ async def config():
     """
     Sets up PostgreSQL
     """
-    sql_file_path = "/app/database/schema.sql"
-    csv_path = "/app/database/sales_transaction.csv"
+    sql_file_path = "../database/schema.sql"
+    csv_path = "../database/sales_transaction.csv"
 
     logger = get_logger()
     logger.info("Attempting to connect to PostgreSQL...")
