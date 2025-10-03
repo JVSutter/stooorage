@@ -5,12 +5,16 @@ import WarningIcon from "@mui/icons-material/Warning";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import ForecastGraph from "./ForecastGraph"
 
 import Card from "./Card";
 
 const Forecast: React.FC = () => {
     return (
         <Grid container spacing={2} sx={{ mb: 4 }}>
+            <Grid item xs={3}>
+                <ForecastGraph />
+            </Grid>
             <Grid item xs={3}>
                 <Card
                     title="Vendas do mês"
@@ -47,6 +51,7 @@ const Forecast: React.FC = () => {
                     iconColor="primary"
                 />
             </Grid>
+            
         </Grid>
     );
 };
