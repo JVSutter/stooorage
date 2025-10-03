@@ -22,7 +22,23 @@ async def config():
 
     logger = get_logger()
     logger.info("Attempting to connect to PostgreSQL...")
+    for i in range(10):
+        try:
+            conn = psycopg2.connect(
+                host="database",
+                port=5432,
+                dbname=os.environ.get("POSTGRESQL_DATABASE"),
+                user=os.environ.get("POSTGRESQL_USERNAME"),
+                password=os.environ.get("POSTGRESQL_PASSWORD"),
+            )
+            conn.close()
+            logger.info("PostgreSQL is available.")
+            break
+        except psycopg2.OperationalError as e:
+            logger.warning(f"PostgreSQL not available yet ({e}), retrying in 1 seconds...")
+            import time
 
+            time.sleep(1)
     try:
         with psycopg2.connect(
             host="database",
