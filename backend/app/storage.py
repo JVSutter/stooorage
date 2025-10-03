@@ -24,6 +24,18 @@ class ProductCreate(BaseModel):
     quantity: int
 
 
+class TransactionCreate(BaseModel):
+    """Expected format for creating a new sales transaction."""
+
+    transaction_no: int
+    transaction_date: str
+    customer_no: int
+    country: str
+    product_no: int
+    quantity: int
+    price_at_sale: float
+
+
 @router.post("/create")
 async def create_product(product: ProductCreate):
     """Insert a new product into the database."""
@@ -88,4 +100,86 @@ async def get_products():
     except Exception as e:
         logger = get_logger()
         logger.error(f"Error fetching products: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+
+
+@router.post("/transaction")
+async def create_transaction(transaction: TransactionCreate):
+    """Registers a new sales transaction and updates our product inventory."""
+
+    logger = get_logger()
+
+    try:
+        with psycopg2.connect(**db_config) as conn:
+            with conn.cursor() as cur:
+                cur.execute("BEGIN")
+
+                cur.execute(
+                    "SELECT quantity FROM product WHERE product_no = %s",
+                    (transaction.product_no,),
+                )
+                result = cur.fetchone()
+
+                if not result:
+                    raise HTTPException(
+                        status_code=404,
+                        detail=f"Product {transaction.product_no} not found",
+                    )
+
+                current_quantity = result[0]
+
+                if current_quantity < transaction.quantity:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Insufficient inventory. Available: {current_quantity}; requested: {transaction.quantity}",
+                    )
+
+                insert_transaction_query = """
+                INSERT INTO sales_transaction 
+                (transaction_no, transaction_date, customer_no, country, product_no, quantity, price_at_sale)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """
+                cur.execute(
+                    insert_transaction_query,
+                    (
+                        transaction.transaction_no,
+                        transaction.transaction_date,
+                        transaction.customer_no,
+                        transaction.country,
+                        transaction.product_no,
+                        transaction.quantity,
+                        transaction.price_at_sale,
+                    ),
+                )
+
+                update_product_query = """
+                UPDATE product 
+                SET quantity = quantity - %s 
+                WHERE product_no = %s
+                """
+                cur.execute(
+                    update_product_query, (transaction.quantity, transaction.product_no)
+                )
+
+                conn.commit()
+
+                logger.info(
+                    f"Transaction {transaction.transaction_no} created successfully. Product {transaction.product_no} inventory reduced by {transaction.quantity}"
+                )
+
+                return {
+                    "message": "Transaction created successfully",
+                    "transaction": transaction.dict(),
+                    "remaining_inventory": current_quantity - transaction.quantity,
+                }
+
+    except psycopg2.IntegrityError as e:
+        logger.error(f"Transaction integrity error: {e}")
+        raise HTTPException(
+            status_code=400, detail="Transaction already exists or invalid data"
+        ) from e
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error creating transaction: {e}")
         raise HTTPException(status_code=500, detail="Internal server error") from e
