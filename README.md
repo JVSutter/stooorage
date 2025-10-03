@@ -50,3 +50,7 @@ Notas:
 - O backend inicializa e popula o banco automaticamente a partir de [backend/database/schema.sql](backend/database/schema.sql) e [backend/database/sales_transaction.csv](backend/database/sales_transaction.csv) durante o startup em [backend/app/main.py](backend/app/main.py).
 - Arquivos úteis: [start.sh](start.sh), [docker-compose.yml](docker-compose.yml).
 
+
+## Uso de IA
+
+A atuação da inteligência artifical no Stoorage é focada em predição de demanda e sugestões de ações para otimizar o estoque. Por exemplo, não faz sentido comprar grandes quantidades de um produto que está com baixa rotatividade, ou por outro lado, deixar de comprar um produto que está com alta rotatividade e pode acabar em falta.
