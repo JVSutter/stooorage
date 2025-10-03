@@ -13,34 +13,87 @@ router = APIRouter(prefix="/ai", tags=["ai"])
 
 
 @router.get("/forecast/id/{product_no}")
-def forecast_product(product_no: str, weeks: int = 8):
+def forecast_product(product_no: str, periods: int = 8, frequency: str = "month"):
+    frequency = frequency.lower()
+    frequency = 'week'
+    if frequency == "week":
+        sql_trunc = 'week'
+        prophet_freq = 'W'
+        resample_rule = 'W'
+        weekly_seasonality = True
+
+    elif frequency == "month":
+        sql_trunc = 'month'
+        prophet_freq = 'M'
+        resample_rule = 'M'
+        weekly_seasonality = False
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Frequência inválida. Use 'week' ou 'month'."
+        )
+
+    # Conexão e consulta
     conn = psycopg2.connect(**db_config)
     query = f"""
-        SELECT DATE_TRUNC('week', transaction_date) AS week_start,
+        SELECT DATE_TRUNC('{sql_trunc}', transaction_date) AS period_start,
                SUM(quantity) AS total_sold
         FROM sales_transaction
         WHERE product_no = %s
-        GROUP BY week_start
-        ORDER BY week_start;
+        GROUP BY period_start
+        ORDER BY period_start;
     """
     df = pd.read_sql(query, conn, params=[product_no])
     conn.close()
 
-    df['week_start'] = pd.to_datetime(df['week_start'], utc=True)
-    if df['week_start'].dt.tz is not None:
-        df['week_start'] = df['week_start'].dt.tz_localize(None)
+    if df.empty:
+        raise HTTPException(status_code=404, detail="No sales data found for this product")
 
-    df = df.rename(columns={"week_start": "ds", "total_sold": "y"})
+    # Preparar dados
+    df = df.rename(columns={"period_start": "ds", "total_sold": "y"})
+    df["ds"] = pd.to_datetime(df["ds"], utc=True)
+    if df["ds"].dt.tz is not None:
+        df["ds"] = df["ds"].dt.tz_localize(None)
 
-    model = Prophet(weekly_seasonality=True)
+    # # Datas contínuas
+    df = df.set_index("ds").resample(resample_rule).sum().reset_index()
+    df["y"] = df["y"].fillna(0)
+
+    # Capacidade máxima para crescimento logístico
+    df["cap"] = df["y"].max() * 1.2
+    df["floor"] = 0
+
+    # Modelo Prophet
+    model = Prophet(
+        growth="logistic",
+        weekly_seasonality=True,
+        yearly_seasonality=False,
+    )
     model.fit(df)
 
-    future = model.make_future_dataframe(periods=weeks, freq="W")
+    # Dataframe futuro
+    future = model.make_future_dataframe(periods=periods, freq=prophet_freq)
+    if future['ds'].dt.tz is not None:
+        future['ds'] = future['ds'].dt.tz_localize(None)
+    future["cap"] = df["cap"].max()
+    future["floor"] = 0
+
+    # Previsão
     forecast = model.predict(future)
 
-    result = forecast[["ds", "yhat", "yhat_lower", "yhat_upper"]].tail(weeks)
-    return result.to_dict(orient="records")
+    logger.info(forecast)
+    logger.info("\n")
+    logger.info(df)
+    # Garantir valores positivos e arredondar
+    forecast["yhat"] = forecast["yhat"].clip(lower=0).round(0)
+    forecast["yhat_lower"] = forecast["yhat_lower"].clip(lower=0).round(0)
+    forecast["yhat_upper"] = forecast["yhat_upper"].clip(lower=0).round(0)
 
+    # Retornar apenas os períodos futuros
+    result = forecast[["ds", "yhat", "yhat_lower", "yhat_upper"]].tail(periods)
+    result["ds"] = result["ds"].dt.strftime("%Y-%m-%d")
+
+    return result.to_dict(orient="records")
 
 @router.get("/forecast/total/{periods}")
 def forecast_total(periods: int = 8, frequency: str = "month"):
