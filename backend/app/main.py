@@ -1,10 +1,11 @@
-from fastapi import FastAPI
-import uvicorn
 from typing import Dict
+
+import uvicorn
+from fastapi import FastAPI
 
 app = FastAPI(
     title="Stooorage Backend",
-    description="API para Previsão de Demanda e Otimização de Estoque."
+    description="API para Previsão de Demanda e Otimização de Estoque.",
 )
 
 
@@ -20,10 +21,10 @@ async def root():
 async def get_previsao(sku_code: str):
     """
     Retorna a previsão de demanda para um SKU específico nas próximas 4 semanas.
-    
+
     Esta rota simula a resposta que viria do seu modelo de IA.
     """
-    
+
     # Simulação da saída da IA (seus dados reais viriam do banco de dados)
     if sku_code.upper() == "PDR_001A":
         previsoes = {
@@ -35,12 +36,15 @@ async def get_previsao(sku_code: str):
                 {"semana": 3, "demanda_prevista": 210, "risco": "Medio"},
                 {"semana": 4, "demanda_prevista": 180, "risco": "Baixo"},
             ],
-            "recomendacao": "Estoque Atual: 120. Sugestão: Pedir 150 unidades hoje."
+            "recomendacao": "Estoque Atual: 120. Sugestão: Pedir 150 unidades hoje.",
         }
         return previsoes
-    
+
     else:
-        return {"sku": sku_code, "message": "SKU não encontrado ou dados insuficientes para previsão."}
+        return {
+            "sku": sku_code,
+            "message": "SKU não encontrado ou dados insuficientes para previsão.",
+        }
 
 
 if __name__ == "__main__":
