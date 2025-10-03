@@ -1,12 +1,10 @@
+import os
 from typing import Dict
 
-import os
-
 import psycopg2
-from log import get_logger
 import uvicorn
 from fastapi import FastAPI
-
+from log import get_logger
 
 app = FastAPI(
     title="Stooorage Backend",
@@ -16,24 +14,43 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def config():
+    """
+    Sets up PostgreSQL
+    """
+
     logger = get_logger()
-    logger.info("Conectando ao banco de dados PostgreSQL...")
+    logger.info("Attempting to connect to PostgreSQL...")
 
-    # Replace with your actual settings
-    conn = psycopg2.connect(
-        host="database",
-        port=5432,
-        dbname=os.environ.get("POSTGRESQL_DATABASE"),
-        user=os.environ.get("POSTGRESQL_USERNAME"),
-        password=os.environ.get("POSTGRESQL_PASSWORD"),
-    )
+    try:
+        with psycopg2.connect(
+            host="database",
+            port=5432,
+            dbname=os.environ.get("POSTGRESQL_DATABASE"),
+            user=os.environ.get("POSTGRESQL_USERNAME"),
+            password=os.environ.get("POSTGRESQL_PASSWORD"),
+        ) as conn:
+            with conn.cursor() as cur:
+                logger.info("Connected to PostgreSQL successfully.")
+                logger.info("Setting up the database schema...")
 
-    cur = conn.cursor()
-    cur.execute("SELECT version();")
-    logger.info(cur.fetchone())
+                sql_file_path = "/app/database/schema.sql"
+                logger.info(f"Executing SQL file: {sql_file_path}")
 
-    cur.close()
-    conn.close()
+                with open(sql_file_path, "r") as sql_file:
+                    sql_content = sql_file.read()
+
+                cur.execute(sql_content)
+                conn.commit()
+                logger.info("Database schema has been set up successfully.")
+
+    except FileNotFoundError:
+        logger.error(f"SQL file not found: {sql_file_path}")
+    except psycopg2.Error as e:
+        logger.error(f"Database error: {e}")
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+
+    logger.info("Database setup completed")
 
 
 @app.get("/")
