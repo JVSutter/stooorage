@@ -14,17 +14,8 @@ app = FastAPI(
 
 app.include_router(storage.router)
 
-db_connection_parameters = {
-    "host": "database",
-    "port": 5432,
-    "dbname": os.environ.get("POSTGRESQL_DATABASE"),
-    "user": os.environ.get("POSTGRESQL_USERNAME"),
-    "password": os.environ.get("POSTGRESQL_PASSWORD"),
-}
-
-
 @app.on_event("startup")
-async def config():
+def config():
     """
     Sets up PostgreSQL
     """
@@ -35,7 +26,7 @@ async def config():
     logger.info("Attempting to connect to PostgreSQL...")
     for i in range(10):
         try:
-            conn = psycopg2.connect(**db_connection_parameters)
+            conn = psycopg2.connect(**storage.db_config)
             conn.close()
             logger.info("PostgreSQL is available.")
             break
@@ -47,7 +38,7 @@ async def config():
 
             time.sleep(1)
     try:
-        with psycopg2.connect(**db_connection_parameters) as conn:
+        with psycopg2.connect(**storage.db_config) as conn:
             with conn.cursor() as cur:
                 logger.info("Connected to PostgreSQL successfully.")
                 logger.info("Setting up the database schema...")
@@ -159,7 +150,7 @@ async def config():
 
 
 @app.get("/")
-async def root():
+def root():
     """
     Initial endpoint to verify the API is online
     """
