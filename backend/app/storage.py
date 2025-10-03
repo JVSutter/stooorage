@@ -76,6 +76,29 @@ async def create_product(product: ProductCreate):
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
+@router.get("/in-stock")
+async def in_storage():
+    """Returns the amount of products currently in stock (quantity > 0)."""
+
+    count = 0
+    logger = get_logger()
+    logger.debug("Fetching the count of products in stock")
+
+    try:
+        with psycopg2.connect(**db_config) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT * FROM product WHERE quantity > 0")
+                products = cur.fetchall()
+
+                for product in products:
+                    count += product[3]
+        return {"in_stock": count}
+
+    except Exception as e:
+        logger.error(f"Error fetching products: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+
+
 @router.get("/")
 async def get_products(
     product_no: Optional[str] = None, product_name: Optional[str] = None
