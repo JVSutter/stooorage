@@ -12,9 +12,9 @@ import RecommendationsCard from "./RecommendationsCard";
 import type { Recommendation } from "./RecommendationsCard";
 
 const recommendations: Recommendation[] = [
-    { type: 'Urgent Action', text: 'Monitor low stock items regularly' },
-    { type: 'Planning', text: 'Consider restocking products with low quantities' },
-    { type: 'Optimization', text: 'Review pricing strategy for high-stock items' },
+    { type: 'Ações Urgentes', text: 'Monitore itens com estoque baixo regularmente' },
+    { type: 'Planejamento', text: 'Considere reabastecer produtos com baixas quantidades' },
+    { type: 'Otimização', text: 'Revise a estratégia de preços para itens com alto estoque' },
 ];
 
 const Inventory: React.FC = () => {

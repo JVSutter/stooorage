@@ -38,7 +38,7 @@ const RecommendationsCard: React.FC<RecommendationsCardProps> = ({ recommendatio
     <Box display="flex" alignItems="center" mb={1}>
       <WarningIcon sx={{ color: 'success.main', mr: 1 }} />
       <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 'bold', color: 'success.main' }}>
-        AI Recommendations
+        Recomendações da IA
       </Typography>
     </Box>
 
