@@ -20,7 +20,7 @@ interface MonthlyChartData {
 }
 
 const MonthlyBarChart: React.FC = () => {
-    const { data: apiData, loading, error } = useMonthlySales(80);
+    const { data: apiData, loading, error } = useMonthlySales(5);
 
     // Transforma os dados da API para o formato do gráfico
     const chartData: MonthlyChartData[] = useMemo(() => {
@@ -197,10 +197,8 @@ const MonthlyBarChart: React.FC = () => {
                             }}
                             cursor={{ fill: "rgba(64, 133, 246, 0.05)" }}
                             formatter={(value: number, name: string, props: any) => {
-                                const label =
-                                    name === "vendasReais"
-                                        ? "Vendas Reais"
-                                        : "Previsão IA";
+                                // Agora 'name' será 'vendasReais' ou 'previsaoIA'
+                                const label = name === "vendasReais" ? "Vendas Reais" : "Previsão IA";
                                 
                                 const item = props.payload;
                                 const error = Math.abs(item.vendasReais - item.previsaoIA);
@@ -213,13 +211,8 @@ const MonthlyBarChart: React.FC = () => {
                             }}
                         />
                         <Legend
-                            wrapperStyle={{
-                                paddingTop: "20px",
-                            }}
                             formatter={(value: string) => {
-                                return value === "vendasReais"
-                                    ? "Vendas Reais"
-                                    : "Previsão IA";
+                                return value === "vendasReais" ? "Vendas Reais" : "Previsão IA";
                             }}
                         />
                         <Bar
@@ -227,14 +220,12 @@ const MonthlyBarChart: React.FC = () => {
                             fill={themeColors.dodgerBlue}
                             radius={[8, 8, 0, 0]}
                             maxBarSize={40}
-                            name="Vendas Reais"
                         />
                         <Bar
                             dataKey="previsaoIA"
                             fill={themeColors.verde}
                             radius={[8, 8, 0, 0]}
                             maxBarSize={40}
-                            name="Previsão IA"
                         />
                     </BarChart>
                 </ResponsiveContainer>
