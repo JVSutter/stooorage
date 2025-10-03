@@ -14,15 +14,15 @@ const menu = [
 
 export default function Sidebar() {
   return (
-    <Box p={2} sx={{ color: "black" }}>
+    <Box sx={{ p: 2, backgroundColor: "background.paper", color: "text.primary" }}>
       <Typography variant="h6" mb={2} fontWeight="bold">
         Stooorage
       </Typography>
       <List>
         {menu.map((item) => (
           <Link key={item.label} href={item.href} style={{ textDecoration: 'none', color: 'inherit' }}>
-            <ListItemButton>
-              <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemButton key={item.label}>
+              <ListItemIcon sx={{ color: "text.primary" }}>{item.icon}</ListItemIcon>
               <ListItemText primary={item.label} />
             </ListItemButton>
           </Link>
