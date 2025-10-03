@@ -3,9 +3,11 @@ import os
 import psycopg2
 import storage
 import uvicorn
-from ai import ai_client
 from fastapi import FastAPI
+
 from log import logger
+import ai
+
 
 app = FastAPI(
     title="Stooorage Backend",
@@ -13,6 +15,7 @@ app = FastAPI(
 )
 
 app.include_router(storage.router)
+app.include_router(ai.router)
 
 
 @app.on_event("startup")
@@ -154,11 +157,7 @@ def root():
     """
     Initial endpoint to verify the API is online
     """
-    ai_response = ai_client.models.generate_content(
-        model="gemini-2.5-flash", contents="Apresente-se brevemente"
-    )
-
-    return {"message": ai_response.text}
+    return {"message": "hello World!"}
 
 
 if __name__ == "__main__":

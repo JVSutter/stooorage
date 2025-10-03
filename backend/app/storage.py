@@ -7,6 +7,7 @@ from log import logger
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/products", tags=["products"])
+
 db_config = {
     "host": "database",
     "port": 5432,

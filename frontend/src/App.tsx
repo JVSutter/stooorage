@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
@@ -32,22 +32,22 @@ export default function App() {
                     }}
                 >
                     <Sidebar menuItems={menuItems} />
-                    <div style={{ flex: 1, padding: 24, backgroundColor: "#f9fafb" }}>
+                    <div
+                        style={{
+                            flex: 1,
+                            padding: 24,
+                            backgroundColor: "#f9fafb",
+                        }}
+                    >
                         <Routes>
-                            <Route
-                                path="/dashboard"
-                                element={<Dashboard />}
-                            />
+                            <Route path="/dashboard" element={<Dashboard />} />
                             <Route path="/actions" element={<Actions />} />
+                            <Route path="/forecast" element={<Forecast />} />
+                            <Route path="/inventory" element={<Inventory />} />
                             <Route
-                                path="/forecast"
-                                element={<Forecast />}
+                                path="*"
+                                element={<Navigate to="/dashboard" replace />}
                             />
-                            <Route
-                                path="/inventory"
-                                element={<Inventory />}
-                            />
-                            <Route path="*" element={<div>Padrão</div>} />{" "}
                         </Routes>
                     </div>
                 </Box>
