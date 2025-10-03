@@ -1,5 +1,5 @@
 "use client";
-import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { Box, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { Dashboard, ShowChart, Public, AccountBalance, Settings } from "@mui/icons-material";
 
 const menu = [
@@ -12,19 +12,8 @@ const menu = [
 
 export default function Sidebar() {
   return (
-    <Drawer
-      variant="permanent"
-      anchor="left"
-      sx={{
-        width: 220,
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
-          width: 220,
-          boxSizing: "border-box",
-        },
-      }}
-    >
-      <Typography variant="h6" p={2} fontWeight="bold">
+    <Box p={2} sx={{ color: "black" }}>
+      <Typography variant="h6" mb={2} fontWeight="bold">
         MarketPulse
       </Typography>
       <List>
@@ -35,6 +24,6 @@ export default function Sidebar() {
           </ListItemButton>
         ))}
       </List>
-    </Drawer>
+    </Box>
   );
 }
