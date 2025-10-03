@@ -3,7 +3,9 @@ import os
 import psycopg2
 import storage
 import uvicorn
+from typing import Dict
 from fastapi import FastAPI
+from pydantic import BaseModel
 from log import get_logger
 
 app = FastAPI(
@@ -13,6 +15,13 @@ app = FastAPI(
 
 app.include_router(storage.router)
 
+db_connection_parameters = {
+    "host": "database",
+    "port": 5432,
+    "dbname": os.environ.get("POSTGRESQL_DATABASE"),
+    "user": os.environ.get("POSTGRESQL_USERNAME"),
+    "password": os.environ.get("POSTGRESQL_PASSWORD"),
+}
 
 @app.on_event("startup")
 async def config():
@@ -24,13 +33,7 @@ async def config():
     logger.info("Attempting to connect to PostgreSQL...")
     for i in range(10):
         try:
-            conn = psycopg2.connect(
-                host="database",
-                port=5432,
-                dbname=os.environ.get("POSTGRESQL_DATABASE"),
-                user=os.environ.get("POSTGRESQL_USERNAME"),
-                password=os.environ.get("POSTGRESQL_PASSWORD"),
-            )
+            conn = psycopg2.connect(**db_connection_parameters)
             conn.close()
             logger.info("PostgreSQL is available.")
             break
@@ -40,18 +43,12 @@ async def config():
 
             time.sleep(1)
     try:
-        with psycopg2.connect(
-            host="database",
-            port=5432,
-            dbname=os.environ.get("POSTGRESQL_DATABASE"),
-            user=os.environ.get("POSTGRESQL_USERNAME"),
-            password=os.environ.get("POSTGRESQL_PASSWORD"),
-        ) as conn:
+        with psycopg2.connect(**db_connection_parameters) as conn:
             with conn.cursor() as cur:
                 logger.info("Connected to PostgreSQL successfully.")
                 logger.info("Setting up the database schema...")
 
-                sql_file_path = "/app/database/schema.sql"
+                sql_file_path = "../database/schema.sql"
                 logger.info(f"Executing SQL file: {sql_file_path}")
 
                 with open(sql_file_path, "r") as sql_file:
