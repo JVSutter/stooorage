@@ -3,12 +3,9 @@ import os
 import psycopg2
 import storage
 import uvicorn
-from fastapi import FastAPI
-from pydantic import BaseModel
-
-from log import get_logger
 from ai import ai_client
-
+from fastapi import FastAPI
+from log import logger
 
 app = FastAPI(
     title="Stooorage Backend",
@@ -26,9 +23,8 @@ def config():
     sql_file_path = "../database/schema.sql"
     csv_path = "../database/sales_transaction.csv"
 
-    logger = get_logger()
     logger.info("Attempting to connect to PostgreSQL...")
-    for i in range(10):
+    for _ in range(10):
         try:
             conn = psycopg2.connect(**storage.db_config)
             conn.close()

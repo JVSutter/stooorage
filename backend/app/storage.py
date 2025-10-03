@@ -3,7 +3,7 @@ from typing import Optional
 
 import psycopg2
 from fastapi import APIRouter, HTTPException
-from log import get_logger
+from log import logger
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/products", tags=["products"])
@@ -40,7 +40,6 @@ class TransactionCreate(BaseModel):
 @router.post("/create")
 async def create_product(product: ProductCreate):
     """Insert a new product into the database."""
-    logger = get_logger()
 
     try:
         with psycopg2.connect(**db_config) as conn:
@@ -81,7 +80,6 @@ async def in_storage():
     """Returns the amount of products currently in stock (quantity > 0)."""
 
     count = 0
-    logger = get_logger()
     logger.debug("Fetching the count of products in stock")
 
     try:
@@ -103,7 +101,6 @@ async def in_storage():
 async def get_sales_last_months(months: int = 3):
     """Get the number of sales and total profit for the last N months."""
 
-    logger = get_logger()
     logger.debug(f"Fetching sales and profit for the last {months} months")
 
     try:
@@ -175,8 +172,8 @@ async def get_products(
     page: int = 1,
     page_size: int = 20,
 ):
-    """Get products with optional filters and pagination (default 20 per page)."""
-    logger = get_logger()
+    """Get all products from the database."""
+
     logger.debug(
         f"Fetching products filters: product_no={product_no}, product_name={product_name}, page={page}, page_size={page_size}"
     )
@@ -251,8 +248,6 @@ async def get_products(
 @router.post("/transactions/create")
 async def create_transaction(transaction: TransactionCreate):
     """Registers a new sales transaction and updates our product inventory."""
-
-    logger = get_logger()
 
     try:
         with psycopg2.connect(**db_config) as conn:
@@ -334,7 +329,6 @@ async def create_transaction(transaction: TransactionCreate):
 async def get_transactions(product_no: Optional[str] = None):
     """Get all sales transactions from the database."""
 
-    logger = get_logger()
     logger.debug(f"Fetching transactions with filter: product_no={product_no}")
 
     try:
