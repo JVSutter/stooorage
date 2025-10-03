@@ -6,7 +6,7 @@ interface InfoCardProps {
   title: string;
   value: string | number;
   description?: string;
-  percentageChange?: number; // para controlar cor verde/vermelho
+  percentageChange?: number;
   icon?: React.ReactNode;
   iconColor?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | string;
 }
@@ -34,7 +34,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
   return (
     <Card 
       sx={{ 
-        minWidth: 250, 
+        minWidth: "350px",
         borderRadius: 2, 
         border: "1px solid #e0e0e0", 
         p: 2, 
@@ -52,7 +52,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
         <Typography variant="body2" color="text.secondary">
           {title}
         </Typography>
-        <Typography variant="h5" fontWeight="bold">
+        <Typography variant="h5" fontWeight="bold" sx={{ display: "flex", justifyContent: "left" }}>
           {value}
         </Typography>
         {description && (

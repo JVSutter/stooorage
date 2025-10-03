@@ -32,7 +32,7 @@ export default function App() {
                     }}
                 >
                     <Sidebar menuItems={menuItems} />
-                    <div style={{ flex: 1, padding: 24 }}>
+                    <div style={{ flex: 1, padding: 24, backgroundColor: "#f9fafb" }}>
                         <Routes>
                             <Route
                                 path="/dashboard"

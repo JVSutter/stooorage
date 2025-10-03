@@ -15,7 +15,7 @@ const Header: React.FC = () => {
       }}
     >
       <Toolbar>
-        <Typography variant="h6" sx={{ fontWeight: 700, p: "0 0 0 10%" }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, p: "0 0 0 8%", fontSize: "1.8rem", color: "hsl(217 91% 60%)" }}>
           Stooorage
         </Typography>
       </Toolbar>

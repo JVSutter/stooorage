@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 
 import WarningIcon from "@mui/icons-material/Warning";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
@@ -12,9 +12,31 @@ import MonthlyTrendChart from "./TendencyGraph";
 
 const Dashboard: React.FC = () => {
     return (
-        <>
+        <Box>
+            <Typography
+                variant="h5"
+                sx={{
+                    display: "flex",
+                    justifyContent: "left",
+                    fontWeight: 800,
+                }}
+            >
+                Dashboard
+            </Typography>
+            <Typography
+                variant="subtitle1"
+                sx={{
+                    display: "flex",
+                    justifyContent: "left",
+                    fontWeight: "normal",
+                    color: "#65758b",
+                    marginBottom: "2%",
+                }}
+            >
+                Real-time overview of your business
+            </Typography>
             <Grid container spacing={2} sx={{ mb: 4 }}>
-                <Grid item xs={3}>
+                <Grid item xs={12} sm={6} md={3}>
                     <Card
                         title="Vendas do mês"
                         value="R$ 250000"
@@ -23,7 +45,7 @@ const Dashboard: React.FC = () => {
                         iconColor="primary"
                     />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={12} sm={6} md={3}>
                     <Card
                         title="Crescimento"
                         value="+ 23%"
@@ -32,7 +54,7 @@ const Dashboard: React.FC = () => {
                         iconColor="primary"
                     />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={12} sm={6} md={3}>
                     <Card
                         title="Produtos em estoque"
                         value="1847"
@@ -41,7 +63,7 @@ const Dashboard: React.FC = () => {
                         iconColor="primary"
                     />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={12} sm={6} md={3}>
                     <Card
                         title="Alertas ativos"
                         value="7"
@@ -61,7 +83,7 @@ const Dashboard: React.FC = () => {
                     <MonthlyTrendChart />
                 </Grid>
             </Grid>
-        </>
+        </Box>
     );
 };
 
