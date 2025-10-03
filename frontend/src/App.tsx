@@ -8,12 +8,15 @@ import Inventory2Icon from "@mui/icons-material/Inventory2";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Dashboard from "./components/Dashboard";
+import Actions from "./components/Actions";
+import Inventory from "./components/Inventory";
+import Forecast from "./components/Forecast";
 
 const menuItems = [
     { label: "Dashboard", path: "/dashboard", icon: DashboardIcon },
-    { label: "Ações", path: "/acoes", icon: BarChartIcon },
-    { label: "Previsões", path: "/previsoes", icon: ShowChartIcon },
-    { label: "Estoque", path: "/estoque", icon: Inventory2Icon },
+    { label: "Actions", path: "/actions", icon: BarChartIcon },
+    { label: "Forecast", path: "/forecast", icon: ShowChartIcon },
+    { label: "Inventory", path: "/inventory", icon: Inventory2Icon },
 ];
 
 export default function App() {
@@ -35,33 +38,19 @@ export default function App() {
                                 path="/dashboard"
                                 element={<Dashboard />}
                             />
-                            <Route path="/acoes" element={<div>Ações</div>} />
+                            <Route path="/actions" element={<Actions />} />
                             <Route
-                                path="/previsoes"
-                                element={<div>Previsões</div>}
+                                path="/forecast"
+                                element={<Forecast />}
                             />
                             <Route
-                                path="/estoque"
-                                element={<div>Estoque</div>}
+                                path="/inventory"
+                                element={<Inventory />}
                             />
                             <Route path="*" element={<div>Padrão</div>} />{" "}
                         </Routes>
                     </div>
                 </Box>
-                {/* <Grid container spacing={2} sx={{ mb: 4 }}>
-                    <Grid item xs={3}>
-                        <Card title="Vendas do mês" value="R$ 250000"  description="+12.5%" icon={<TrendingUpIcon />} iconColor="primary" />
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Card title="Crescimento" value="+ 23%" description="+8.2%" icon={<ShowChartIcon />} iconColor="primary" />
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Card title="Produtos em estoque" value="1847" description="-3.7%" icon={<Inventory2Icon />} iconColor="primary" />
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Card title="Alertas ativos" value="7" description="" icon={<WarningIcon />} iconColor="primary" />
-                    </Grid>
-                </Grid> */}
             </div>
         </>
     );
