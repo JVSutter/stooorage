@@ -25,6 +25,8 @@ services:
       POSTGRESQL_LOG_TIMEZONE: America/Sao_Paulo
     volumes:
       - postgres_data:/bitnami/postgresql
+    ports:
+      - "5432:5432"
 
   frontend:
     build:
