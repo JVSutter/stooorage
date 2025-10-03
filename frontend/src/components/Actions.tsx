@@ -7,9 +7,12 @@ import Inventory2Icon from "@mui/icons-material/Inventory2";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
 import Card from "./Card";
+import DynamicForm from "./DynamicForm";
+
 
 const Actions: React.FC = () => {
     return (
+        <>
         <Grid container spacing={2} sx={{ mb: 4 }}>
             <Grid item xs={3}>
                 <Card
@@ -48,6 +51,8 @@ const Actions: React.FC = () => {
                 />
             </Grid>
         </Grid>
+        <DynamicForm />
+        </>
     );
 };
 
