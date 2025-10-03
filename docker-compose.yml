@@ -1,12 +1,35 @@
-
 services:
   backend:
+    environment:
+      POSTGRESQL_DATABASE: stoorage_db
+      POSTGRESQL_USERNAME: stoorage
+      POSTGRESQL_PASSWORD: 123
+    env_file:
+    - backend/.env
     build:
       context: ./backend
       dockerfile: Dockerfile
     restart: always
     ports:
       - "8000:8000"
+    depends_on:
+      - database
+    volumes:
+      - ./backend:/backend
+
+  database:
+    hostname: database
+    image: bitnamilegacy/postgresql:14.11.0
+    environment:
+      POSTGRESQL_DATABASE: stoorage_db
+      POSTGRESQL_USERNAME: stoorage
+      POSTGRESQL_PASSWORD: 123
+      POSTGRESQL_TIMEZONE: America/Sao_Paulo
+      POSTGRESQL_LOG_TIMEZONE: America/Sao_Paulo
+    volumes:
+      - postgres_data:/bitnami/postgresql
+    ports:
+      - "5432:5432"
 
   frontend:
     build:
@@ -14,8 +37,15 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "3000:3000"
+      - "5173:5173"
     depends_on:
       - backend
     environment:
       - NEXT_PUBLIC_API_URL=http://backend:8000
+      - WATCHPACK_POLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
