@@ -1,8 +1,6 @@
-// InventoryTable.tsx
-
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper, Chip, Box
+  TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper, Chip, Box, TableSortLabel
 } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -11,42 +9,47 @@ import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 export type StockStatus = 'Normal' | 'Low' | 'Critical';
 
 export interface Product {
-  id: string;
-  name: string;
+  product_no: string;
+  product_name: string;
   quantity: number;
-  minStock: number;
-  weeklySales: number;
-  remainingDays: number;
-  status: StockStatus;
+  price: number;
 }
 
 interface InventoryTableProps {
   products: Product[];
 }
 
-const getStatusChip = (status: StockStatus) => {
+type Order = 'asc' | 'desc';
+
+const getStockStatus = (quantity: number): StockStatus => {
+  if (quantity < 20) return 'Critical';
+  if (quantity < 50) return 'Low';
+  return 'Normal';
+};
+
+const getStatusChip = (quantity: number) => {
+  const status = getStockStatus(quantity);
   let colorMap;
 
-  // Define cores personalizadas para o background e texto do Chip
   switch (status) {
     case 'Normal':
       colorMap = {
-        bgColor: '#e8f5e9', // Verde muito claro (semelhante ao success light)
-        textColor: '#2e7d32', // Verde escuro (semelhante ao success main)
+        bgColor: '#e8f5e9',
+        textColor: '#2e7d32',
         Icon: CheckCircleOutlineIcon,
       };
       break;
     case 'Low':
       colorMap = {
-        bgColor: '#fff8e1', // Amarelo muito claro (semelhante ao warning light)
-        textColor: '#f9a825', // Laranja amarelado (semelhante ao warning main)
+        bgColor: '#fff8e1',
+        textColor: '#f9a825',
         Icon: ErrorOutlineIcon,
       };
       break;
     case 'Critical':
       colorMap = {
-        bgColor: '#ffebee', // Vermelho muito claro (semelhante ao error light)
-        textColor: '#d32f2f', // Vermelho escuro (semelhante ao error main)
+        bgColor: '#ffebee',
+        textColor: '#d32f2f',
         Icon: ReportProblemIcon,
       };
       break;
@@ -80,57 +83,80 @@ const getStatusChip = (status: StockStatus) => {
   );
 };
 
-const getDaysStyle = (days: number): React.CSSProperties => {
-  if (days <= 15) return { color: '#f44336', fontWeight: 'bold', fontSize: "0.8rem", py: 0.6 };
-  if (days <= 30) return { color: '#ff9800', fontWeight: 'bold', fontSize: "0.8rem", py: 0.6 };
-  return { color: '#4caf50', fontSize: "0.8rem", py: 0.6 };
-};
-
 const headCells = [
-  { id: 'product', label: 'Product' },
-  { id: 'quantity', label: 'Quantity' },
-  { id: 'minStock', label: 'Min Stock' },
-  { id: 'weeklySales', label: 'Weekly Sales' },
-  { id: 'remainingDays', label: 'Days Remaining' },
-  { id: 'status', label: 'Status' },
+  { id: 'product_no', label: 'Código do Produto', sortable: false },
+  { id: 'product_name', label: 'Nome do Produto', sortable: false },
+  { id: 'quantity', label: 'Quantidade', sortable: true },
+  { id: 'price', label: 'Preço ($)', sortable: false },
+  { id: 'status', label: 'Status', sortable: false },
 ];
 
+const InventoryTable: React.FC<InventoryTableProps> = ({ products }) => {
+  const [order, setOrder] = useState<Order>('desc');
+  const [orderBy, setOrderBy] = useState<string>('quantity');
 
-const InventoryTable: React.FC<InventoryTableProps> = ({ products }) => (
-  <TableContainer component={Paper} elevation={1} sx={{ borderRadius: "1%", boxShadow: "none", border: "1px solid #e0e0e0",  }}>
-    <Table aria-label="inventory table">
-      <TableHead>
-        <TableRow sx={{ backgroundColor: '#fff' }}>
-          {headCells.map((headCell) => (
-            <TableCell key={headCell.id} sx={{ fontWeight: 'bold', color: "#65758b", fontSize: "0.8rem" }}>
-              {headCell.label}
-            </TableCell>
-          ))}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {products.map((row) => (
-          <TableRow
-            key={row.id}
-            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-          >
-            <TableCell component="th" scope="row" sx={{ fontSize: "0.8rem", py: 0.6}}>
-              {row.name}
-            </TableCell>
-            <TableCell sx={{ fontSize: "0.8rem", py: 0.6 }}>{row.quantity}</TableCell>
-            <TableCell sx={{ fontSize: "0.8rem", py: 0.6 }}>{row.minStock}</TableCell>
-            <TableCell sx={{ fontSize: "0.8rem", py: 0.6 }}>{row.weeklySales}/wk</TableCell>
-            <TableCell sx={getDaysStyle(row.remainingDays)}>
-              {row.remainingDays} days
-            </TableCell>
-            <TableCell sx={{ fontSize: "0.8rem", py: 0.6 }}>
-              {getStatusChip(row.status)}
-            </TableCell>
+  const handleRequestSort = (property: string) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const sortedProducts = React.useMemo(() => {
+    const comparator = (a: Product, b: Product) => {
+      if (orderBy === 'quantity') {
+        return order === 'asc' ? a.quantity - b.quantity : b.quantity - a.quantity;
+      }
+      return 0;
+    };
+
+    return [...products].sort(comparator);
+  }, [products, order, orderBy]);
+
+  return (
+    <TableContainer component={Paper} elevation={1} sx={{ borderRadius: "1%", boxShadow: "none", border: "1px solid #e0e0e0" }}>
+      <Table aria-label="inventory table">
+        <TableHead>
+          <TableRow sx={{ backgroundColor: '#fff' }}>
+            {headCells.map((headCell) => (
+              <TableCell key={headCell.id} sx={{ fontWeight: 'bold', color: "#65758b", fontSize: "0.8rem" }}>
+                {headCell.sortable ? (
+                  <TableSortLabel
+                    active={orderBy === headCell.id}
+                    direction={orderBy === headCell.id ? order : 'asc'}
+                    onClick={() => handleRequestSort(headCell.id)}
+                  >
+                    {headCell.label}
+                  </TableSortLabel>
+                ) : (
+                  headCell.label
+                )}
+              </TableCell>
+            ))}
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </TableContainer>
-);
+        </TableHead>
+        <TableBody>
+          {sortedProducts.map((row) => (
+            <TableRow
+              key={row.product_no}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th" scope="row" sx={{ fontSize: "0.8rem", py: 0.6 }}>
+                {row.product_no}
+              </TableCell>
+              <TableCell sx={{ fontSize: "0.8rem", py: 0.6 }}>{row.product_name}</TableCell>
+              <TableCell sx={{ fontSize: "0.8rem", py: 0.6 }}>{row.quantity}</TableCell>
+              <TableCell sx={{ fontSize: "0.8rem", py: 0.6 }}>
+                {row.price.toFixed(2)}
+              </TableCell>
+              <TableCell sx={{ fontSize: "0.8rem", py: 0.6 }}>
+                {getStatusChip(row.quantity)}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
 
 export default InventoryTable;

@@ -384,3 +384,95 @@ async def get_transactions(product_no: Optional[str] = None):
     except Exception as e:
         logger.error(f"Error fetching transactions: {e}")
         raise HTTPException(status_code=500, detail="Internal server error") from e
+
+
+@router.get("/stock-alerts")
+async def get_stock_alerts():
+    """
+    Returns count of products with low and critical stock
+    """
+
+    logger.debug("Fetching stock alerts for products")
+
+    try:
+        with psycopg2.connect(**db_config) as conn:
+            with conn.cursor() as cur:
+                # Critical stock (< 20)
+                cur.execute("SELECT COUNT(*) FROM product WHERE quantity < 20")
+                critical = cur.fetchone()[0]
+
+                # Low stock (>= 20 and < 50)
+                cur.execute("SELECT COUNT(*) FROM product WHERE quantity >= 20 AND quantity < 50")
+                low = cur.fetchone()[0]
+
+                total_alerts = critical + low
+
+                return {
+                    "critical": critical,
+                    "low": low,
+                    "total_alerts": total_alerts,
+                }
+
+    except Exception as e:
+        logger.error(f"Error fetching stock alerts: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+
+
+@router.get("/sales/growth")
+async def get_sales_growth(months: int = 2):
+    """
+    Calculates the percentage growth of sales between months
+    """
+
+    logger.debug(f"Calculating sales growth for the last {months} months")
+
+    try:
+        with psycopg2.connect(**db_config) as conn:
+            with conn.cursor() as cur:
+                # Fetch sales data for the last N months
+                cur.execute(
+                    """
+                    SELECT 
+                        DATE_TRUNC('month', transaction_date) as month,
+                        SUM(price_at_sale * quantity) as total_revenue,
+                        SUM(quantity) as total_quantity
+                    FROM sales_transaction
+                    WHERE transaction_date >= CURRENT_DATE - INTERVAL '%s months'
+                    GROUP BY DATE_TRUNC('month', transaction_date)
+                    ORDER BY month DESC
+                    LIMIT %s
+                    """,
+                    (months, months),
+                )
+                results = cur.fetchall()
+
+                if len(results) < 2:
+                    return {
+                        "growth_percentage": 0,
+                        "current_month_revenue": results[0][1] if results else 0,
+                        "previous_month_revenue": 0,
+                    }
+
+                current_month = results[0]
+                previous_month = results[1]
+
+                current_revenue = float(current_month[1])
+                previous_revenue = float(previous_month[1])
+
+                # Calculate percentage growth
+                if previous_revenue > 0:
+                    growth = ((current_revenue - previous_revenue) / previous_revenue) * 100
+                else:
+                    growth = 0
+
+                return {
+                    "growth_percentage": round(growth, 1),
+                    "current_month_revenue": round(current_revenue, 2),
+                    "previous_month_revenue": round(previous_revenue, 2),
+                    "current_month": current_month[0].strftime("%Y-%m"),
+                    "previous_month": previous_month[0].strftime("%Y-%m"),
+                }
+
+    except Exception as e:
+        logger.error(f"Error calculating sales growth: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error") from e
