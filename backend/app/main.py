@@ -3,8 +3,10 @@ from typing import Dict
 import os
 
 import psycopg2
+from log import get_logger
 import uvicorn
 from fastapi import FastAPI
+
 
 app = FastAPI(
     title="Stooorage Backend",
@@ -14,7 +16,8 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def config():
-    print("Conectando ao banco de dados PostgreSQL...")
+    logger = get_logger()
+    logger.info("Conectando ao banco de dados PostgreSQL...")
 
     # Replace with your actual settings
     conn = psycopg2.connect(
@@ -27,7 +30,7 @@ async def config():
 
     cur = conn.cursor()
     cur.execute("SELECT version();")
-    print(cur.fetchone())
+    logger.info(cur.fetchone())
 
     cur.close()
     conn.close()
