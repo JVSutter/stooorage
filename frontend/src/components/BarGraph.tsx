@@ -9,50 +9,66 @@ import {
     Legend,
     ResponsiveContainer,
 } from "recharts";
-import { Paper, Typography, Box } from "@mui/material";
+import { Paper, Typography, Box, CircularProgress, Alert } from "@mui/material";
 import { themeColors } from "../theme";
+import { useMonthlySales } from "./MonthlySales";
 
-interface SalesComparisonData {
-    day: string;
+interface MonthlyChartData {
+    month: string;
     vendasReais: number;
     previsaoIA: number;
 }
 
-const salesComparisonData: SalesComparisonData[] = [
-    { day: "Seg", vendasReais: 450, previsaoIA: 480 },
-    { day: "Ter", vendasReais: 620, previsaoIA: 590 },
-    { day: "Qua", vendasReais: 380, previsaoIA: 420 },
-    { day: "Qui", vendasReais: 710, previsaoIA: 680 },
-    { day: "Sex", vendasReais: 890, previsaoIA: 850 },
-    { day: "Sáb", vendasReais: 950, previsaoIA: 920 },
-    { day: "Dom", vendasReais: 520, previsaoIA: 550 },
-];
+const MonthlyBarChart: React.FC = () => {
+    const { data: apiData, loading, error } = useMonthlySales(80);
 
-const SalesChart: React.FC = () => {
+    // Transforma os dados da API para o formato do gráfico
+    const chartData: MonthlyChartData[] = useMemo(() => {
+        return apiData.map((item) => {
+            const monthDate = new Date(item.month_start);
+            const monthName = monthDate.toLocaleDateString('pt-BR', { month: 'short' });
+            const monthFormatted = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+            // Vendas reais vêm da API
+            const vendasReais = item.quantity_sold;
+            
+            // Simulação da previsão IA (você pode substituir por dados reais da sua IA)
+            // Por enquanto, vou adicionar uma variação de ±5% nas vendas reais
+            const variacao = (Math.random() - 0.5) * 0.1; // -5% a +5%
+            const previsaoIA = Math.round(vendasReais * (1 + variacao));
+
+            return {
+                month: monthFormatted,
+                vendasReais,
+                previsaoIA,
+            };
+        }).reverse(); // Reverse para mostrar do mais antigo para o mais recente
+    }, [apiData]);
+
     // Calcula a precisão da IA dinamicamente
     const calculateAccuracy = useMemo(() => {
-        // Calcula o erro absoluto percentual médio (MAPE - Mean Absolute Percentage Error)
-        const mapeValues = salesComparisonData.map((item) => {
+        if (chartData.length === 0) return "0.0";
+
+        const mapeValues = chartData.map((item) => {
             const error = Math.abs(item.vendasReais - item.previsaoIA);
             const percentageError = (error / item.vendasReais) * 100;
             return percentageError;
         });
 
-        // Média dos erros percentuais
         const avgError = mapeValues.reduce((sum, val) => sum + val, 0) / mapeValues.length;
-        
-        // Precisão = 100% - erro médio
         const accuracy = 100 - avgError;
 
-        return accuracy.toFixed(1); // Retorna com 1 casa decimal
-    }, []);
+        return accuracy.toFixed(1);
+    }, [chartData]);
 
     // Calcula estatísticas adicionais
     const statistics = useMemo(() => {
-        const totalReal = salesComparisonData.reduce((sum, item) => sum + item.vendasReais, 0);
-        const totalPrevisao = salesComparisonData.reduce((sum, item) => sum + item.previsaoIA, 0);
+        const totalReal = chartData.reduce((sum, item) => sum + item.vendasReais, 0);
+        const totalPrevisao = chartData.reduce((sum, item) => sum + item.previsaoIA, 0);
         const difference = totalReal - totalPrevisao;
-        const differencePercentage = ((difference / totalReal) * 100).toFixed(1);
+        const differencePercentage = totalReal > 0 
+            ? ((difference / totalReal) * 100).toFixed(1)
+            : "0.0";
 
         return {
             totalReal,
@@ -60,7 +76,43 @@ const SalesChart: React.FC = () => {
             difference,
             differencePercentage,
         };
-    }, []);
+    }, [chartData]);
+
+    if (loading) {
+        return (
+            <Paper
+                elevation={1}
+                sx={{
+                    p: 3,
+                    borderRadius: 2,
+                    border: "1px solid #e0e0e0",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "400px",
+                }}
+            >
+                <CircularProgress />
+            </Paper>
+        );
+    }
+
+    if (error) {
+        return (
+            <Paper
+                elevation={1}
+                sx={{
+                    p: 3,
+                    borderRadius: 2,
+                    border: "1px solid #e0e0e0",
+                }}
+            >
+                <Alert severity="error">
+                    Erro ao carregar dados: {error}
+                </Alert>
+            </Paper>
+        );
+    }
 
     return (
         <Paper
@@ -81,14 +133,14 @@ const SalesChart: React.FC = () => {
                 gutterBottom
                 sx={{ color: themeColors.textPrimary }}
             >
-                Vendas Diárias vs Previsão IA
+                Vendas Mensais vs Previsão IA
             </Typography>
             <Typography
                 variant="body2"
                 color="text.secondary"
                 sx={{ mb: 2 }}
             >
-                Comparação dos últimos 7 dias
+                Últimos 6 meses
             </Typography>
 
             <Box
@@ -100,7 +152,7 @@ const SalesChart: React.FC = () => {
             >
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
-                        data={salesComparisonData}
+                        data={chartData}
                         margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
                         barGap={8}
                         barCategoryGap="20%"
@@ -111,7 +163,7 @@ const SalesChart: React.FC = () => {
                             vertical={false}
                         />
                         <XAxis
-                            dataKey="day"
+                            dataKey="month"
                             axisLine={false}
                             tickLine={false}
                             tick={{
@@ -127,7 +179,7 @@ const SalesChart: React.FC = () => {
                                 fontSize: 12,
                             }}
                             label={{
-                                value: "Vendas",
+                                value: "Quantidade Vendida",
                                 angle: -90,
                                 position: "insideLeft",
                                 style: {
@@ -150,13 +202,12 @@ const SalesChart: React.FC = () => {
                                         ? "Vendas Reais"
                                         : "Previsão IA";
                                 
-                                // Calcula o erro para este dia específico
                                 const item = props.payload;
                                 const error = Math.abs(item.vendasReais - item.previsaoIA);
                                 const errorPercent = ((error / item.vendasReais) * 100).toFixed(1);
                                 
                                 return [
-                                    `${value} vendas${name === "previsaoIA" ? ` (erro: ${errorPercent}%)` : ""}`,
+                                    `${value.toLocaleString()} unidades${name === "previsaoIA" ? ` (erro: ${errorPercent}%)` : ""}`,
                                     label
                                 ];
                             }}
@@ -237,7 +288,7 @@ const SalesChart: React.FC = () => {
                         Total: Real vs Previsto
                     </Typography>
                     <Typography variant="body2" fontWeight="500">
-                        {statistics.totalReal} vs {statistics.totalPrevisao}
+                        {statistics.totalReal.toLocaleString()} vs {statistics.totalPrevisao.toLocaleString()}
                         <Typography
                             component="span"
                             variant="caption"
@@ -248,7 +299,7 @@ const SalesChart: React.FC = () => {
                                     : themeColors.vermelhoDamasco,
                             }}
                         >
-                            ({statistics.differencePercentage > 0 ? "+" : ""}{statistics.differencePercentage}%)
+                            ({parseFloat(statistics.differencePercentage) > 0 ? "+" : ""}{statistics.differencePercentage}%)
                         </Typography>
                     </Typography>
                 </Box>
@@ -257,4 +308,4 @@ const SalesChart: React.FC = () => {
     );
 };
 
-export default SalesChart;
+export default MonthlyBarChart;
