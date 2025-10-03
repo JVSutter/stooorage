@@ -8,6 +8,18 @@ services:
     ports:
       - "8000:8000"
 
+  database:
+    hostname: database
+    image: bitnami/postgresql:14.11.0
+    environment:
+      POSTGRESQL_DATABASE: stoorage_db
+      POSTGRESQL_USERNAME: stoorage
+      POSTGRESQL_PASSWORD: 123
+      POSTGRESQL_TIMEZONE: America/Sao_Paulo
+      POSTGRESQL_LOG_TIMEZONE: America/Sao_Paulo
+    volumes:
+      - postgres_data:/bitnami/postgresql
+
   frontend:
     build:
       context: ./frontend
@@ -19,3 +31,6 @@ services:
       - backend
     environment:
       - NEXT_PUBLIC_API_URL=http://backend:8000
+
+volumes:
+  postgres_data:
