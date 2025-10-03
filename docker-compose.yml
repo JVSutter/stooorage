@@ -1,5 +1,9 @@
 services:
   backend:
+    environment:
+      POSTGRESQL_DATABASE: stoorage_db
+      POSTGRESQL_USERNAME: stoorage
+      POSTGRESQL_PASSWORD: 123
     build:
       context: ./backend
       dockerfile: Dockerfile
