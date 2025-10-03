@@ -5,25 +5,15 @@ import psycopg2
 from fastapi import APIRouter
 from prophet import Prophet
 
-router = APIRouter(prefix="/ai", tags=["ai"])
+from constants import db_config
 
-DB_DSN = (
-    "host='DB_HOST' "
-    "port='5432' "
-    "dbname='DB_NAME' "
-    "user='DB_USER' "
-    "password='DB_PASSWORD'"
-)
+router = APIRouter(prefix="/ai", tags=["ai"])
 
 
 @router.get("/forecast/{product_no}")
 def forecast_product(product_no: str, weeks: int = 8):
-    """"
-    Forecast product sales for the next `weeks` weeks using Prophet.
-    """
-
-    conn = psycopg2.connect(DB_DSN)
-    query = """
+    conn = psycopg2.connect(**db_config)
+    query = f"""
         SELECT DATE_TRUNC('week', transaction_date) AS week_start,
                SUM(quantity) AS total_sold
         FROM sales_transaction
@@ -33,6 +23,10 @@ def forecast_product(product_no: str, weeks: int = 8):
     """
     df = pd.read_sql(query, conn, params=[product_no])
     conn.close()
+
+    df['week_start'] = pd.to_datetime(df['week_start'], utc=True)
+    if df['week_start'].dt.tz is not None:
+        df['week_start'] = df['week_start'].dt.tz_localize(None)
 
     # Preparar dados para Prophet
     df = df.rename(columns={"week_start": "ds", "total_sold": "y"})

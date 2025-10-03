@@ -10,15 +10,9 @@ from fastapi import APIRouter, HTTPException
 from log import logger
 from pydantic import BaseModel
 
-router = APIRouter(prefix="/products", tags=["products"])
+from constants import db_config
 
-db_config = {
-    "host": "database",
-    "port": 5432,
-    "dbname": os.environ.get("POSTGRESQL_DATABASE"),
-    "user": os.environ.get("POSTGRESQL_USERNAME"),
-    "password": os.environ.get("POSTGRESQL_PASSWORD"),
-}
+router = APIRouter(prefix="/products", tags=["products"])
 
 
 class ProductCreate(BaseModel):
