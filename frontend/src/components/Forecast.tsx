@@ -5,53 +5,59 @@ import WarningIcon from "@mui/icons-material/Warning";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import ForecastGraph from "./ForecastGraph"
+import ForecastGraph from "./ForecastGraph";
 
 import Card from "./Card";
 
 const Forecast: React.FC = () => {
     return (
         <Grid container spacing={2} sx={{ mb: 4 }}>
-            <Grid item xs={3}>
+            {/* Coluna do gráfico */}
+            <Grid item xs={8}>
                 <ForecastGraph />
             </Grid>
-            <Grid item xs={3}>
-                <Card
-                    title="Vendas do mês"
-                    value="R$ 250000"
-                    description="+12.5%"
-                    icon={<TrendingUpIcon />}
-                    iconColor="primary"
-                />
+
+            {/* Coluna dos cards */}
+            <Grid item xs={4}>
+                <Grid container direction="column" spacing={2}>
+                    <Grid item>
+                        <Card
+                            title="Crescimento Previsto"
+                            value="Confiança: 78%"
+                            description="Produto C pode esgotar em 12 dias baseado na tendência"
+                            icon={<WarningIcon />}
+                            iconColor="primary"
+                        />
+                    </Grid>
+                    <Grid item>
+                        <Card
+                            title="Pico de Demanda"
+                            value="Confiança 92%"
+                            description="Alta demanda esperada no Produto A na semana 2"
+                            icon={<WarningIcon />}
+                            iconColor="primary"
+                        />
+                    </Grid>
+                    <Grid item>
+                        <Card
+                            title="Estoque crítico"
+                            value="Confiança: 78%"
+                            description="Produto C pode esgotar em 12 dias baseado na tendência"
+                            icon={<WarningIcon />}
+                            iconColor="primary"
+                        />
+                    </Grid>
+                    <Grid item>
+                        <Card
+                            title="Oportunidade Sazonal"
+                            value="Confiança: 85%"
+                            description="Padrão indica aumento de 15% no final de semana"
+                            icon={<WarningIcon />}
+                            iconColor="primary"
+                        />
+                    </Grid>
+                </Grid>
             </Grid>
-            <Grid item xs={3}>
-                <Card
-                    title="Crescimento"
-                    value="+ 23%"
-                    description="+8.2%"
-                    icon={<ShowChartIcon />}
-                    iconColor="primary"
-                />
-            </Grid>
-            <Grid item xs={3}>
-                <Card
-                    title="Produtos em estoque"
-                    value="1847"
-                    description="-3.7%"
-                    icon={<Inventory2Icon />}
-                    iconColor="primary"
-                />
-            </Grid>
-            <Grid item xs={3}>
-                <Card
-                    title="Alertas ativos"
-                    value="7"
-                    description=""
-                    icon={<WarningIcon />}
-                    iconColor="primary"
-                />
-            </Grid>
-            
         </Grid>
     );
 };
