@@ -10,7 +10,7 @@ from fastapi import APIRouter, HTTPException
 from log import logger
 from pydantic import BaseModel
 
-from constants import db_config
+from constants import db_config, CURRENT_DATE
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -118,10 +118,11 @@ async def get_sales_last_months(months: int = 3):
                     SUM(st.price_at_sale * st.quantity) as total_revenue
                 FROM sales_transaction st
                 JOIN product p ON st.product_no = p.product_no
-                WHERE st.transaction_date >= CURRENT_DATE - INTERVAL '%s months'
+                WHERE st.transaction_date < %s
+                  AND st.transaction_date >= %s - INTERVAL '%s months'
                 """
 
-                cur.execute(summary_query, (months,))
+                cur.execute(summary_query, (CURRENT_DATE, CURRENT_DATE, months))
                 summary_result = cur.fetchone()
 
                 monthly_query = """
@@ -132,12 +133,13 @@ async def get_sales_last_months(months: int = 3):
                     SUM(st.price_at_sale * st.quantity) as revenue
                 FROM sales_transaction st
                 JOIN product p ON st.product_no = p.product_no
-                WHERE st.transaction_date >= CURRENT_DATE - INTERVAL '%s months'
+                WHERE st.transaction_date < %s
+                  AND st.transaction_date >= %s - INTERVAL '%s months'
                 GROUP BY DATE_TRUNC('month', st.transaction_date)
                 ORDER BY month_start DESC
                 """
 
-                cur.execute(monthly_query, (months,))
+                cur.execute(monthly_query, (CURRENT_DATE, CURRENT_DATE, months))
                 monthly_results = cur.fetchall()
 
                 return {
