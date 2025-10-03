@@ -10,6 +10,18 @@ services:
       - ./backend:/app
       - /app/app/__pycache__
 
+  database:
+    hostname: database
+    image: bitnami/postgresql:14.11.0
+    environment:
+      POSTGRESQL_DATABASE: stoorage_db
+      POSTGRESQL_USERNAME: stoorage
+      POSTGRESQL_PASSWORD: 123
+      POSTGRESQL_TIMEZONE: America/Sao_Paulo
+      POSTGRESQL_LOG_TIMEZONE: America/Sao_Paulo
+    volumes:
+      - postgres_data:/bitnami/postgresql
+
   frontend:
     build:
       context: ./frontend
@@ -26,3 +38,6 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
+
+volumes:
+  postgres_data:
