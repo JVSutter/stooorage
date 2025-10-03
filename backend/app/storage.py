@@ -1,5 +1,7 @@
 import os
 
+from typing import Optional
+
 import psycopg2
 from fastapi import APIRouter, HTTPException
 from log import get_logger
@@ -76,13 +78,28 @@ async def create_product(product: ProductCreate):
 
 
 @router.get("/")
-async def get_products():
+async def get_products(product_no: Optional[int] = None, product_name: Optional[str] = None):
     """Get all products from the database."""
 
     try:
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT * FROM product")
+                query = "SELECT * FROM product"
+                params = []
+                conditions = []
+
+                for condition, value in [
+                    ("product_no", product_no),
+                    ("product_name", product_name),
+                ]:
+                    if value is not None:
+                        conditions.append(f"{condition} = %s")
+                        params.append(value)
+
+                if conditions:
+                    query += " WHERE " + " AND ".join(conditions)
+
+                cur.execute(query, params)
                 products = cur.fetchall()
 
                 return {
